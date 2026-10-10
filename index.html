@@ -5,384 +5,315 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#10251d">
-<meta name="description" content="PocketSeller customer replies and booking assistant">
-<link rel="manifest" href="manifest.json">
-<title>PocketSeller Smart Replies</title>
+<title>PocketSeller</title>
 <style>
-:root{font-family:Arial,sans-serif;color:#17251f;background:#f3f6f4}
 *{box-sizing:border-box}
-body{margin:0}
+body{margin:0;background:#f3f6f4;color:#17251f;font:16px Arial,sans-serif}
 header{background:#10251d;color:white;padding:20px 16px}
-header h1{margin:0;font-size:25px}
-header p{margin:7px 0 0;color:#c9ded2;font-size:14px}
-main{max-width:850px;margin:auto;padding:14px}
-.status{padding:10px;background:#e0eee5;border-radius:10px;font-size:13px;margin-bottom:12px}
-nav{display:flex;gap:7px;overflow:auto;padding:3px 0 12px}
-nav button{white-space:nowrap;border:0;background:#dfe7e1;padding:11px;border-radius:9px}
-nav button.active{background:#205b43;color:white}
+header h1{margin:0;font-size:26px}
+header p{color:#c9ded2;margin:7px 0 0}
+main{max-width:760px;margin:auto;padding:14px}
+nav{display:flex;gap:7px;overflow:auto;margin-bottom:12px}
+button,.btn{border:0;border-radius:9px;padding:12px;cursor:pointer;font-weight:bold}
+nav button{white-space:nowrap;background:#dfe7e1}
+nav button.active,.primary{background:#205b43;color:white}
+.secondary{background:#e4eee7;color:#183d2c}
 section{display:none}
 section.active{display:block}
-.card{background:white;border:1px solid #dce5df;border-radius:13px;padding:15px;margin-bottom:12px}
-h2{font-size:19px;margin:0 0 12px}
-h3{font-size:16px;margin:10px 0}
-label{display:block;font-size:13px;font-weight:bold;margin:10px 0 5px}
+.card{background:white;border:1px solid #dce5df;border-radius:13px;padding:16px;margin-bottom:12px}
+h2{font-size:20px;margin:0 0 12px}
+h3{font-size:16px}
+label{display:block;font-size:13px;font-weight:bold;margin:12px 0 5px}
 input,textarea,select{width:100%;padding:12px;border:1px solid #cbd7ce;border-radius:8px;font:inherit;background:white}
-textarea{min-height:75px;resize:vertical}
-button{cursor:pointer}
-.primary{background:#205b43;color:white;border:0;border-radius:8px;padding:12px;font-weight:bold}
-.secondary{background:#e6eee8;color:#183d2c;border:0;border-radius:8px;padding:10px}
-.danger{background:#fae6e3;color:#8b2820;border:0;border-radius:8px;padding:8px}
-form button{margin-top:12px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+textarea{min-height:70px}
+form button{margin-top:14px}
+button.full{width:100%;margin-top:12px}
+.small{font-size:13px;color:#637269;line-height:1.5}
 .metric{background:#edf4ef;padding:13px;border-radius:10px}
-.metric strong{display:block;font-size:22px;margin-top:5px;overflow-wrap:anywhere}
-.small{font-size:12px;color:#637269}
+.metric strong{display:block;font-size:23px;margin-top:5px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .item{border-top:1px solid #e4eae5;padding:12px 0;overflow-wrap:anywhere}
 .item:first-child{border-top:0}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.tag{display:inline-block;background:#e3eee6;border-radius:20px;padding:4px 8px;font-size:12px}
-.reply{background:#f0f5f1;border-left:3px solid #205b43;padding:12px;border-radius:6px;white-space:pre-wrap}
-.empty{color:#738077;font-size:14px;padding:12px 0}
-footer{text-align:center;color:#6b786f;font-size:12px;padding:20px}
-@media(min-width:600px){main{padding:22px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.reply{white-space:pre-wrap;background:#f0f5f1;padding:12px;border-left:3px solid #205b43;border-radius:6px;line-height:1.5}
+.tag{font-size:12px;background:#e3eee6;border-radius:20px;padding:5px 8px}
+.empty{padding:12px 0;color:#738077}
+a{color:#205b43;overflow-wrap:anywhere}
+footer{text-align:center;padding:22px;color:#637269;font-size:12px}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
 <header>
-  <h1>PocketSeller</h1>
-  <p>Smart Replies · Customer Enquiries · Bookings</p>
+<h1>PocketSeller</h1>
+<p>Less typing. Faster replies. Easier bookings.</p>
 </header>
 <main>
-  <div class="status" id="status">Checking connection...</div>
-  <nav>
-    <button class="active" data-tab="home">Home</button>
-    <button data-tab="business">Business</button>
-    <button data-tab="services">Services</button>
-    <button data-tab="faqs">Auto Replies</button>
-    <button data-tab="enquiries">Enquiries</button>
-    <button data-tab="bookings">Bookings</button>
-    <button data-tab="backup">Backup</button>
-  </nav>
+<div id="publicPage" class="hidden">
+<div class="card">
+<h2 id="publicTitle">Book an appointment</h2>
+<p id="publicInfo" class="small"></p>
+<form id="publicForm">
+<label>Your name</label>
+<input id="pName" required maxlength="80" placeholder="Enter your name">
+<label>Choose a service</label>
+<select id="pService" required></select>
+<label>Preferred date</label>
+<input id="pDate" type="date" required>
+<label>Preferred time</label>
+<select id="pTime" required>
+<option value="">Choose a time</option>
+<option>9:00 AM</option><option>10:00 AM</option>
+<option>11:00 AM</option><option>12:00 PM</option>
+<option>1:00 PM</option><option>2:00 PM</option>
+<option>3:00 PM</option><option>4:00 PM</option>
+<option>5:00 PM</option>
+</select>
+<label>Contact number or social handle</label>
+<input id="pContact" required maxlength="100" placeholder="How can the business contact you?">
+<button class="primary full" type="submit">Send booking request on WhatsApp</button>
+</form>
+<p class="small">This sends a request to the business. Your appointment is not confirmed until the business confirms it.</p>
+</div>
+<div class="card">
+<h3>Services and prices</h3>
+<div id="publicServices"></div>
+</div>
+</div>
 
-  <section id="home" class="active">
-    <div class="card">
-      <h2 id="welcome">Your business dashboard</h2>
-      <p class="small">Your records are saved in this browser on this device.</p>
-      <div class="grid">
-        <div class="metric">Enquiries<strong id="mEnquiries">0</strong></div>
-        <div class="metric">Open enquiries<strong id="mOpen">0</strong></div>
-        <div class="metric">Bookings<strong id="mBookings">0</strong></div>
-        <div class="metric">Balances due<strong id="mBalance">₦0</strong></div>
-      </div>
-    </div>
-    <div class="card">
-      <h2>Try a suggested reply</h2>
-      <p class="small">Choose a question to preview an answer using your saved business information.</p>
-      <label for="previewQuestion">Customer question</label>
-      <select id="previewQuestion">
-        <option>How much do you charge?</option>
-        <option>Where are you located?</option>
-        <option>What time do you open?</option>
-        <option>How can I book an appointment?</option>
-      </select>
-      <button class="primary" id="previewBtn">Generate reply preview</button>
-      <div id="preview" class="reply" style="display:none;margin-top:12px"></div>
-      <p class="small">Preview only: this prototype does not read or send social-media messages.</p>
-    </div>
-    <div class="card">
-      <h2>Recent enquiries</h2>
-      <div id="recent"></div>
-    </div>
-  </section>
+<div id="adminPage">
+<nav>
+<button class="active" data-tab="home">Home</button>
+<button data-tab="setup">Business setup</button>
+<button data-tab="services">Services</button>
+<button data-tab="replies">Smart replies</button>
+<button data-tab="bookings">Bookings</button>
+</nav>
 
-  <section id="business">
-    <div class="card">
-      <h2>Business information</h2>
-      <form id="businessForm">
-        <label for="bizName">Business name</label>
-        <input id="bizName" required maxlength="80" placeholder="e.g. Ada Hair Studio">
-        <label for="bizLocation">Location or address</label>
-        <input id="bizLocation" maxlength="180" placeholder="Your business location">
-        <label for="bizHours">Opening hours</label>
-        <input id="bizHours" maxlength="120" placeholder="e.g. Mon-Sat, 9am-6pm">
-        <label for="bizBooking">Booking and deposit rules</label>
-        <textarea id="bizBooking" maxlength="700" placeholder="Explain how customers should book and pay a deposit"></textarea>
-        <button class="primary" type="submit">Save business information</button>
-      </form>
-    </div>
-  </section>
+<section id="home" class="active">
+<div class="card">
+<h2 id="welcome">Welcome to PocketSeller</h2>
+<p class="small">Set up your business once. PocketSeller will prepare common answers for you.</p>
+<div class="grid">
+<div class="metric">Services<strong id="mServices">0</strong></div>
+<div class="metric">Bookings recorded<strong id="mBookings">0</strong></div>
+</div>
+<button class="primary full" id="shareBtn">Get my booking link</button>
+<div id="linkBox" class="hidden">
+<p class="small">Copy this link and share it with customers.</p>
+<input id="bookingLink" readonly>
+<button class="secondary full" id="copyBtn">Copy booking link</button>
+<p class="small">Customers can select a service and send a request to your business WhatsApp.</p>
+</div>
+</div>
+<div class="card">
+<h2>Try a smart reply</h2>
+<label>Choose a customer question</label>
+<select id="question">
+<option>How much do you charge?</option>
+<option>Where are you located?</option>
+<option>What time do you open?</option>
+<option>How do I book?</option>
+<option>Do I need to pay a deposit?</option>
+<option>What services do you offer?</option>
+</select>
+<button class="primary full" id="previewBtn">Show suggested answer</button>
+<div id="preview" class="reply hidden" style="margin-top:12px"></div>
+</div>
+</section>
 
-  <section id="services">
-    <div class="card">
-      <h2>Add a service</h2>
-      <form id="serviceForm">
-        <label for="serviceName">Service name</label>
-        <input id="serviceName" required maxlength="100" placeholder="e.g. Frontal installation">
-        <label for="servicePrice">Price in naira (₦)</label>
-        <input id="servicePrice" required type="number" min="0" step="1" placeholder="15000">
-        <label for="serviceNote">Extra details (optional)</label>
-        <input id="serviceNote" maxlength="180" placeholder="Duration, what is included, etc.">
-        <button class="primary" type="submit">Add service</button>
-      </form>
-    </div>
-    <div class="card">
-      <h2>Saved services</h2>
-      <div id="serviceList"></div>
-    </div>
-  </section>
+<section id="setup">
+<div class="card">
+<h2>Quick business setup</h2>
+<p class="small">Fill in what you know. You can change it later.</p>
+<form id="bizForm">
+<label>Business name</label>
+<input id="bizName" required maxlength="80" placeholder="e.g. Ada Hair Studio">
+<label>Business type</label>
+<select id="bizType">
+<option>Hairstylist / Wig installer</option>
+<option>Barber</option><option>Nail technician</option>
+<option>Makeup artist</option><option>Fashion designer</option>
+<option>Other service business</option>
+</select>
+<label>Location</label>
+<input id="bizLocation" maxlength="180" placeholder="Shop address or area">
+<label>Opening hours</label>
+<input id="bizHours" maxlength="120" placeholder="e.g. Monday to Saturday, 9am to 6pm">
+<label>WhatsApp number</label>
+<input id="bizPhone" inputmode="numeric" maxlength="20" placeholder="e.g. 2348012345678">
+<p class="small">Enter the number with country code, digits only. For Nigeria, start with 234 and leave out the first zero.</p>
+<label>Deposit and booking policy</label>
+<textarea id="bizPolicy" maxlength="500" placeholder="e.g. A deposit is required to secure an appointment."></textarea>
+<button class="primary full" type="submit">Save business setup</button>
+</form>
+</div>
+</section>
 
-  <section id="faqs">
-    <div class="card">
-      <h2>Add an approved answer</h2>
-      <form id="faqForm">
-        <label for="faqQuestion">Common customer question</label>
-        <input id="faqQuestion" required maxlength="180" placeholder="e.g. Do I need an appointment?">
-        <label for="faqAnswer">Your approved answer</label>
-        <textarea id="faqAnswer" required maxlength="700" placeholder="Write the exact answer the business wants to give"></textarea>
-        <button class="primary" type="submit">Save question and answer</button>
-      </form>
-    </div>
-    <div class="card">
-      <h2>Saved answers</h2>
-      <div id="faqList"></div>
-    </div>
-    <div class="card">
-      <h3>Important</h3>
-      <p class="small">Answers are drafts for now. Later, an approved platform integration can use them to reply automatically. Questions without a reliable answer should go to the business owner.</p>
-    </div>
-  </section>
+<section id="services">
+<div class="card">
+<h2>Add a service</h2>
+<form id="serviceForm">
+<label>Service name</label>
+<input id="sName" required maxlength="100" placeholder="e.g. Frontal installation">
+<label>Price in naira</label>
+<input id="sPrice" required type="number" min="0" step="1" placeholder="15000">
+<label>Extra details (optional)</label>
+<input id="sNote" maxlength="180" placeholder="Duration or what's included">
+<button class="primary full" type="submit">Add service</button>
+</form>
+</div>
+<div class="card">
+<h2>Your services</h2>
+<div id="serviceList"></div>
+</div>
+</section>
 
-  <section id="enquiries">
-    <div class="card">
-      <h2>Record a customer enquiry</h2>
-      <form id="enquiryForm">
-        <label for="customerName">Customer name (optional)</label>
-        <input id="customerName" maxlength="100" placeholder="Customer name">
-        <label for="customerContact">Contact or social handle (optional)</label>
-        <input id="customerContact" maxlength="150" placeholder="e.g. Snapchat username">
-        <label for="customerChannel">Platform</label>
-        <select id="customerChannel">
-          <option>Snapchat</option><option>Instagram</option><option>TikTok</option>
-          <option>WhatsApp</option><option>Facebook</option><option>Phone</option><option>Other</option>
-        </select>
-        <label for="enquiryText">What did the customer ask?</label>
-        <textarea id="enquiryText" required maxlength="700" placeholder="Enter a brief summary, not sensitive private details"></textarea>
-        <label for="enquiryState">Status</label>
-        <select id="enquiryState">
-          <option>Needs reply</option><option>Reply drafted</option><option>Replied</option><option>Closed</option>
-        </select>
-        <button class="primary" type="submit">Save enquiry</button>
-      </form>
-    </div>
-    <div class="card">
-      <h2>Customer enquiries</h2>
-      <div id="enquiryList"></div>
-    </div>
-  </section>
+<section id="replies">
+<div class="card">
+<h2>Suggested answers</h2>
+<p class="small">These answers are prepared from your saved business information. Review them before using them with customers.</p>
+<div id="replyList"></div>
+</div>
+</section>
 
-  <section id="bookings">
-    <div class="card">
-      <h2>Record a booking</h2>
-      <form id="bookingForm">
-        <label for="bookName">Customer name</label>
-        <input id="bookName" required maxlength="100" placeholder="Customer name">
-        <label for="bookService">Service</label>
-        <select id="bookService"></select>
-        <label for="bookDate">Appointment date</label>
-        <input id="bookDate" type="date" required>
-        <label for="bookPrice">Total price (₦)</label>
-        <input id="bookPrice" type="number" min="0" step="1" required placeholder="0">
-        <label for="bookPaid">Amount paid so far (₦)</label>
-        <input id="bookPaid" type="number" min="0" step="1" value="0" required>
-        <label for="bookState">Booking status</label>
-        <select id="bookState"><option>Pending</option><option>Confirmed</option><option>Completed</option><option>Cancelled</option></select>
-        <button class="primary" type="submit">Save booking</button>
-      </form>
-    </div>
-    <div class="card">
-      <h2>Bookings and balances</h2>
-      <div id="bookingList"></div>
-    </div>
-  </section>
-
-  <section id="backup">
-    <div class="card">
-      <h2>Back up your records</h2>
-      <p>Export your saved records to a JSON file and keep it somewhere safe. This is a local prototype; it does not yet have cloud backup or account sync.</p>
-      <button class="primary" id="exportBtn">Export backup</button>
-      <label for="importFile">Restore a previous backup</label>
-      <input id="importFile" type="file" accept=".json,application/json">
-      <p class="small">Restoring replaces the records currently saved in this browser. Export a backup first.</p>
-    </div>
-    <div class="card">
-      <h2>Data and privacy</h2>
-      <p class="small">Use sample data while testing. Anyone who can access this browser profile may be able to access these records. Clearing browser data can erase them. Do not use this prototype as your only business record system.</p>
-      <button class="danger" id="clearBtn">Delete all local records</button>
-    </div>
-  </section>
+<section id="bookings">
+<div class="card">
+<h2>Booking requests</h2>
+<p class="small">Requests sent through WhatsApp arrive in your WhatsApp chat. Add them here to keep a local record.</p>
+<form id="bookingForm">
+<label>Customer name</label>
+<input id="bName" required maxlength="80">
+<label>Service</label>
+<input id="bService" required maxlength="100">
+<label>Appointment date</label>
+<input id="bDate" type="date" required>
+<label>Total price (₦)</label>
+<input id="bPrice" type="number" min="0" required>
+<label>Deposit paid (₦)</label>
+<input id="bPaid" type="number" min="0" value="0" required>
+<button class="primary full" type="submit">Record booking</button>
+</form>
+</div>
+<div class="card">
+<h2>Saved bookings</h2>
+<div id="bookingList"></div>
+</div>
+</section>
+</div>
 </main>
-<footer>PocketSeller prototype · Local records · Social integrations not connected</footer>
+<footer>PocketSeller · Simple tools for small businesses</footer>
 
 <script>
 (function(){
 "use strict";
-var KEY="pocketseller_v1";
-var data={business:{name:"",location:"",hours:"",booking:""},services:[],faqs:[],enquiries:[],bookings:[]};
-function load(){
- try{
-  var saved=localStorage.getItem(KEY);
-  if(saved){var parsed=JSON.parse(saved);if(parsed&&parsed.business)data=parsed;}
- }catch(e){}
-}
-function save(){
- try{localStorage.setItem(KEY,JSON.stringify(data));}
- catch(e){alert("Could not save. Your browser storage may be full.");}
- render();
-}
-function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
-function esc(s){
- return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-}
+var KEY="pocketseller_simple_v2";
+var data={business:{name:"",type:"Hairstylist / Wig installer",location:"",hours:"",phone:"",policy:""},services:[],bookings:[]};
+function $(id){return document.getElementById(id);}
 function money(n){return "₦"+Number(n||0).toLocaleString("en-NG");}
-function el(id){return document.getElementById(id);}
-function empty(msg){return '<div class="empty">'+esc(msg)+'</div>';}
-function removeItem(type,key){
- if(!confirm("Delete this record?"))return;
- data[type]=data[type].filter(function(x){return x.id!==key;});save();
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){alert("Could not save on this device.");}render();}
+function load(){
+try{
+var old=localStorage.getItem(KEY);
+if(old){var x=JSON.parse(old);if(x.business&&Array.isArray(x.services)&&Array.isArray(x.bookings))data=x;}
+}catch(e){}
 }
 function switchTab(name){
- document.querySelectorAll("section").forEach(function(s){s.classList.toggle("active",s.id===name);});
- document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("active",b.dataset.tab===name);});
+document.querySelectorAll("#adminPage section").forEach(function(s){s.classList.toggle("active",s.id===name);});
+document.querySelectorAll("nav button").forEach(function(b){b.classList.toggle("active",b.dataset.tab===name);});
 }
-document.querySelectorAll("nav button").forEach(function(b){
- b.addEventListener("click",function(){switchTab(b.dataset.tab);});
-});
-function replyFor(question){
- var q=question.toLowerCase();
- var found=data.faqs.find(function(f){return q.indexOf(f.question.toLowerCase())>=0||f.question.toLowerCase().indexOf(q)>=0;});
- if(found)return found.answer;
- if(q.indexOf("price")>=0||q.indexOf("much")>=0||q.indexOf("charge")>=0){
-  if(!data.services.length)return "Thanks for contacting "+(data.business.name||"us")+". Please contact us for current prices.";
-  return "Thanks for contacting "+(data.business.name||"us")+". Our saved service prices are:\n"+data.services.map(function(s){return s.name+": "+money(s.price);}).join("\n")+"\nPlease tell us which service you need.";
- }
- if(q.indexOf("where")>=0||q.indexOf("location")>=0)return data.business.location?"We are located at "+data.business.location+".":"Thanks for contacting us. Please message us for our location.";
- if(q.indexOf("time")>=0||q.indexOf("open")>=0||q.indexOf("hour")>=0)return data.business.hours?"Our opening hours are "+data.business.hours+".":"Please contact us to confirm our opening hours.";
- if(q.indexOf("book")>=0||q.indexOf("appointment")>=0)return "Thanks for your interest! Please tell us the service and date you prefer. Your appointment is not confirmed until the business confirms it.";
- return "Thanks for contacting "+(data.business.name||"us")+"! We have received your question. Our team will reply as soon as possible.";
+document.querySelectorAll("nav button").forEach(function(b){b.addEventListener("click",function(){switchTab(b.dataset.tab);});});
+function answers(){
+var b=data.business;
+var prices=data.services.length?data.services.map(function(s){return s.name+": "+money(s.price);}).join("\n"):"Please contact us for our current prices.";
+return [
+["How much do you charge?","Hello! Thanks for contacting "+(b.name||"us")+". Our services and prices are:\n"+prices+"\nWhich service are you interested in?"],
+["Where are you located?",b.location?"Hello! "+(b.name||"We")+" are located at "+b.location+".":"Hello! Please message us to confirm our location."],
+["What time do you open?",b.hours?"Our opening hours are "+b.hours+". We look forward to seeing you!":"Please message us to confirm our opening hours."],
+["How do I book?","You can request an appointment using our booking link. Choose your service, preferred date and time, then send your request. We will confirm availability."],
+["Do I need to pay a deposit?",b.policy||"Please contact us to confirm our deposit policy. Your appointment is not confirmed until we confirm it."],
+["What services do you offer?",data.services.length?"We offer:\n"+data.services.map(function(s){return s.name+" — "+money(s.price);}).join("\n"):"Please contact us to learn about our services."]
+];
 }
-el("previewBtn").addEventListener("click",function(){
- var q=el("previewQuestion").value;
- el("preview").style.display="block";
- el("preview").textContent=replyFor(q);
-});
-el("businessForm").addEventListener("submit",function(e){
- e.preventDefault();
- data.business={name:el("bizName").value.trim(),location:el("bizLocation").value.trim(),hours:el("bizHours").value.trim(),booking:el("bizBooking").value.trim()};
- save();alert("Business information saved.");
-});
-el("serviceForm").addEventListener("submit",function(e){
- e.preventDefault();
- data.services.push({id:id(),name:el("serviceName").value.trim(),price:Number(el("servicePrice").value),note:el("serviceNote").value.trim()});
- this.reset();save();
-});
-el("faqForm").addEventListener("submit",function(e){
- e.preventDefault();
- data.faqs.push({id:id(),question:el("faqQuestion").value.trim(),answer:el("faqAnswer").value.trim()});
- this.reset();save();
-});
-el("enquiryForm").addEventListener("submit",function(e){
- e.preventDefault();
- data.enquiries.unshift({id:id(),name:el("customerName").value.trim(),contact:el("customerContact").value.trim(),channel:el("customerChannel").value,text:el("enquiryText").value.trim(),state:el("enquiryState").value,created:new Date().toLocaleString()});
- this.reset();save();
-});
-el("bookingForm").addEventListener("submit",function(e){
- e.preventDefault();
- var price=Number(el("bookPrice").value),paid=Number(el("bookPaid").value);
- if(paid>price){alert("Amount paid cannot be greater than the total price.");return;}
- data.bookings.unshift({id:id(),name:el("bookName").value.trim(),service:el("bookService").value,date:el("bookDate").value,price:price,paid:paid,state:el("bookState").value});
- this.reset();el("bookPaid").value="0";save();
-});
 function render(){
- el("welcome").textContent=data.business.name||"Your business dashboard";
- el("mEnquiries").textContent=data.enquiries.length;
- el("mOpen").textContent=data.enquiries.filter(function(x){return x.state==="Needs reply"||x.state==="Reply drafted";}).length;
- el("mBookings").textContent=data.bookings.filter(function(x){return x.state!=="Cancelled";}).length;
- el("mBalance").textContent=money(data.bookings.reduce(function(sum,b){return sum+(b.state==="Cancelled"?0:Math.max(0,b.price-b.paid));},0));
- el("bizName").value=data.business.name||"";
- el("bizLocation").value=data.business.location||"";
- el("bizHours").value=data.business.hours||"";
- el("bizBooking").value=data.business.booking||"";
- el("serviceList").innerHTML=data.services.length?data.services.map(function(s){
-  return '<div class="item"><div class="row"><strong>'+esc(s.name)+'</strong><button class="danger" data-remove="services" data-id="'+esc(s.id)+'">Delete</button></div><p>'+money(s.price)+' <span class="small">'+esc(s.note)+'</span></p></div>';
- }).join(""):empty("No services saved yet.");
- el("faqList").innerHTML=data.faqs.length?data.faqs.map(function(f){
-  return '<div class="item"><div class="row"><strong>'+esc(f.question)+'</strong><button class="danger" data-remove="faqs" data-id="'+esc(f.id)+'">Delete</button></div><p>'+esc(f.answer)+'</p></div>';
- }).join(""):empty("No approved answers saved yet.");
- el("enquiryList").innerHTML=data.enquiries.length?data.enquiries.map(function(x){
-  return '<div class="item"><div class="row"><strong>'+esc(x.name||"Customer")+'</strong><span class="tag">'+esc(x.state)+'</span></div><p class="small">'+esc(x.channel)+' · '+esc(x.created)+'</p><p>'+esc(x.text)+'</p><p class="small">'+esc(x.contact)+'</p><label>Update status</label><select data-state="'+esc(x.id)+'"><option '+(x.state==="Needs reply"?"selected":"")+'>Needs reply</option><option '+(x.state==="Reply drafted"?"selected":"")+'>Reply drafted</option><option '+(x.state==="Replied"?"selected":"")+'>Replied</option><option '+(x.state==="Closed"?"selected":"")+'>Closed</option></select><button class="secondary" data-draft="'+esc(x.id)+'">Suggest reply</button> <button class="danger" data-remove="enquiries" data-id="'+esc(x.id)+'">Delete</button><div id="draft-'+esc(x.id)+'"></div></div>';
- }).join(""):empty("No enquiries recorded.");
- el("bookingList").innerHTML=data.bookings.length?data.bookings.map(function(b){
-  return '<div class="item"><div class="row"><strong>'+esc(b.name)+'</strong><span class="tag">'+esc(b.state)+'</span></div><p>'+esc(b.service)+' · '+esc(b.date)+'</p><p>Total: '+money(b.price)+' · Paid: '+money(b.paid)+' · Balance: <strong>'+money(Math.max(0,b.price-b.paid))+'</strong></p><label>Update payment received (total)</label><input type="number" min="0" step="1" value="'+b.paid+'" data-paid="'+esc(b.id)+'"><label>Booking status</label><select data-bookstate="'+esc(b.id)+'"><option '+(b.state==="Pending"?"selected":"")+'>Pending</option><option '+(b.state==="Confirmed"?"selected":"")+'>Confirmed</option><option '+(b.state==="Completed"?"selected":"")+'>Completed</option><option '+(b.state==="Cancelled"?"selected":"")+'>Cancelled</option></select><button class="danger" data-remove="bookings" data-id="'+esc(b.id)+'">Delete</button></div>';
- }).join(""):empty("No bookings recorded.");
- el("recent").innerHTML=data.enquiries.length?data.enquiries.slice(0,4).map(function(x){return '<div class="item"><strong>'+esc(x.name||"Customer")+'</strong> <span class="tag">'+esc(x.state)+'</span><p>'+esc(x.channel)+' · '+esc(x.text)+'</p></div>';}).join(""):empty("Your newest enquiries will appear here.");
- el("bookService").innerHTML=data.services.length?data.services.map(function(s){return '<option>'+esc(s.name)+'</option>';}).join(""):'<option value="Service not listed">Service not listed</option>';
+var b=data.business;
+$("welcome").textContent=b.name||"Welcome to PocketSeller";
+$("mServices").textContent=data.services.length;
+$("mBookings").textContent=data.bookings.length;
+$("bizName").value=b.name||"";
+$("bizType").value=b.type||"Hairstylist / Wig installer";
+$("bizLocation").value=b.location||"";
+$("bizHours").value=b.hours||"";
+$("bizPhone").value=b.phone||"";
+$("bizPolicy").value=b.policy||"";
+$("serviceList").innerHTML=data.services.length?data.services.map(function(s){return '<div class="item"><div class="row"><strong>'+esc(s.name)+'</strong><button class="secondary" data-delete="'+esc(s.id)+'">Delete</button></div><p>'+money(s.price)+' · '+esc(s.note)+'</p></div>';}).join(""):'<p class="empty">No services yet. Add your first service above.</p>';
+$("replyList").innerHTML=answers().map(function(a){return '<div class="item"><strong>'+esc(a[0])+'</strong><p class="reply">'+esc(a[1])+'</p></div>';}).join("");
+$("bookingList").innerHTML=data.bookings.length?data.bookings.map(function(x){return '<div class="item"><strong>'+esc(x.name)+'</strong><p>'+esc(x.service)+' · '+esc(x.date)+'</p><p>Total: '+money(x.price)+' · Paid: '+money(x.paid)+' · Due: <strong>'+money(Math.max(0,x.price-x.paid))+'</strong></p><button class="secondary" data-bdelete="'+esc(x.id)+'">Delete record</button></div>';}).join(""):'<p class="empty">No bookings recorded yet.</p>';
+$("pService").innerHTML=data.services.length?data.services.map(function(s){return '<option value="'+esc(s.name)+'">'+esc(s.name)+' — '+money(s.price)+'</option>';}).join(""):'<option value="">Contact the business for services</option>';
+$("publicServices").innerHTML=data.services.length?data.services.map(function(s){return '<div class="item"><strong>'+esc(s.name)+'</strong><p>'+money(s.price)+' · '+esc(s.note)+'</p></div>';}).join(""):'<p>Please contact us for our service list.</p>';
+$("publicTitle").textContent="Book with "+(b.name||"our business");
+$("publicInfo").textContent=(b.location?b.location+" · ":"")+(b.hours||"Please submit your preferred appointment time.");
 }
+$("bizForm").addEventListener("submit",function(e){
+e.preventDefault();
+data.business={name:$("bizName").value.trim(),type:$("bizType").value,location:$("bizLocation").value.trim(),hours:$("bizHours").value.trim(),phone:$("bizPhone").value.replace(/\D/g,""),policy:$("bizPolicy").value.trim()};
+save();alert("Business setup saved. Suggested answers have been updated.");
+});
+$("serviceForm").addEventListener("submit",function(e){
+e.preventDefault();
+data.services.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:$("sName").value.trim(),price:Number($("sPrice").value),note:$("sNote").value.trim()});
+this.reset();save();
+});
+$("previewBtn").addEventListener("click",function(){
+var selected=$("question").value;
+var found=answers().find(function(a){return a[0]===selected;});
+$("preview").textContent=found?found[1]:"";
+$("preview").classList.remove("hidden");
+});
+$("shareBtn").addEventListener("click",function(){
+if(!data.business.name){alert("Please save your business information first.");switchTab("setup");return;}
+if(!data.services.length){alert("Please add at least one service first.");switchTab("services");return;}
+$("bookingLink").value=location.href.split("?")[0]+"?book=1";
+$("linkBox").classList.remove("hidden");
+});
+$("copyBtn").addEventListener("click",async function(){
+try{await navigator.clipboard.writeText($("bookingLink").value);alert("Booking link copied.");}
+catch(e){$("bookingLink").select();alert("Select and copy the link.");}
+});
+$("publicForm").addEventListener("submit",function(e){
+e.preventDefault();
+var phone=data.business.phone;
+if(!phone){alert("The business has not added a WhatsApp number yet.");return;}
+var message="Hello "+data.business.name+"! I would like to request an appointment.\nName: "+$("pName").value.trim()+"\nService: "+$("pService").value+"\nPreferred date: "+$("pDate").value+"\nPreferred time: "+$("pTime").value+"\nContact: "+$("pContact").value.trim()+"\nPlease confirm if this time is available.";
+location.href="https://wa.me/"+phone+"?text="+encodeURIComponent(message);
+});
+$("bookingForm").addEventListener("submit",function(e){
+e.preventDefault();
+var price=Number($("bPrice").value),paid=Number($("bPaid").value);
+if(paid>price){alert("Deposit cannot exceed total price.");return;}
+data.bookings.unshift({id:Date.now().toString(36),name:$("bName").value.trim(),service:$("bService").value.trim(),date:$("bDate").value,price:price,paid:paid});
+this.reset();$("bPaid").value="0";save();
+});
 document.addEventListener("click",function(e){
- var t=e.target;
- if(t.dataset.remove)removeItem(t.dataset.remove,t.dataset.id);
- if(t.dataset.draft){
-  var x=data.enquiries.find(function(y){return y.id===t.dataset.draft;});
-  var box=el("draft-"+t.dataset.draft);
-  box.innerHTML='<p class="reply">'+esc(replyFor(x.text))+'</p><p class="small">Copy this draft and review it before sending it yourself.</p>';
- }
-});
-document.addEventListener("change",function(e){
- var t=e.target;
- if(t.dataset.state){
-  var x=data.enquiries.find(function(y){return y.id===t.dataset.state;});if(x){x.state=t.value;save();}
- }
- if(t.dataset.bookstate){
-  var b=data.bookings.find(function(y){return y.id===t.dataset.bookstate;});if(b){b.state=t.value;save();}
- }
- if(t.dataset.paid){
-  var b=data.bookings.find(function(y){return y.id===t.dataset.paid;});
-  var amount=Number(t.value);
-  if(b&&amount>=0&&amount<=b.price){b.paid=amount;save();}
-  else{alert("Enter an amount between zero and the total price.");render();}
- }
-});
-el("exportBtn").addEventListener("click",function(){
- var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
- var url=URL.createObjectURL(blob),a=document.createElement("a");
- a.href=url;a.download="pocketseller-backup.json";a.click();URL.revokeObjectURL(url);
-});
-el("importFile").addEventListener("change",function(){
- var file=this.files[0];if(!file)return;
- var reader=new FileReader();
- reader.onload=function(){
-  try{
-   var x=JSON.parse(reader.result);
-   if(!x.business||!Array.isArray(x.services)||!Array.isArray(x.faqs)||!Array.isArray(x.enquiries)||!Array.isArray(x.bookings))throw Error();
-   if(confirm("Replace the current records with this backup?")){data=x;save();alert("Backup restored.");}
-  }catch(e){alert("That file is not a valid PocketSeller backup.");}
-  el("importFile").value="";
- };
- reader.readAsText(file);
-});
-el("clearBtn").addEventListener("click",function(){
- if(confirm("Permanently delete all PocketSeller records saved in this browser? Export a backup first if needed.")){
-  data={business:{name:"",location:"",hours:"",booking:""},services:[],faqs:[],enquiries:[],bookings:[]};save();
- }
-});
-function updateStatus(){
- el("status").textContent=navigator.onLine?"Online · Records saved on this device":"Offline · Records can still be saved on this device";
+if(e.target.dataset.delete){
+if(confirm("Delete this service?")){data.services=data.services.filter(function(s){return s.id!==e.target.dataset.delete;});save();}
 }
-window.addEventListener("online",updateStatus);
-window.addEventListener("offline",updateStatus);
-if("serviceWorker" in navigator){
- window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){});});
+if(e.target.dataset.bdelete){
+if(confirm("Delete this booking record?")){data.bookings=data.bookings.filter(function(b){return b.id!==e.target.dataset.bdelete;});save();}
 }
-load();render();updateStatus();
+});
+load();
+var params=new URLSearchParams(location.search);
+if(params.get("book")==="1"){
+$("adminPage").classList.add("hidden");
+$("publicPage").classList.remove("hidden");
+$("pDate").min=new Date().toISOString().slice(0,10);
+}else{
+$("adminPage").classList.remove("hidden");
+$("publicPage").classList.add("hidden");
+}
+render();
 })();
 </script>
 </body>
