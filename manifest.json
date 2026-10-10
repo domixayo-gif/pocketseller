@@ -1,0 +1,11 @@
+
+{
+  "name": "PocketSeller Smart Replies",
+  "short_name": "PocketSeller",
+  "description": "Customer enquiries, approved replies and bookings",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f6f4",
+  "theme_color": "#10251d"
+}
