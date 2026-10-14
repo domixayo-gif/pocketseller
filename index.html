@@ -91,20 +91,39 @@ footer{text-align:center;padding:22px;color:#637269;font-size:12px}
 </div>
 </div>
 
-<div id="adminPage">
+
 <div id="authCard" class="card">
-<h2>Business owner sign-in</h2>
-<p class="small">Sign in to manage your PocketSeller business and bookings.</p>
+<h2 id="authTitle">Business owner sign-in</h2>
+<p id="authDescription" class="small">Sign in to manage your PocketSeller business and bookings.</p>
+
 <form id="authForm">
+<div id="authNameWrap" class="hidden">
+<label>Your name</label>
+<input id="authName" maxlength="80" autocomplete="name">
+</div>
+
 <label>Email address</label>
 <input id="authEmail" type="email" autocomplete="email" required>
-<label>Password</label>
+
+<label id="passwordLabel">Password</label>
 <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required>
-<button class="primary full" type="submit">Sign in</button>
-<button class="secondary full" id="signupBtn" type="button">Create an account</button>
-</form>
-<p id="authMessage" class="small"></p>
+
+<div id="confirmPasswordWrap" class="hidden">
+<label>Confirm password</label>
+<input id="authPasswordConfirm" type="password" minlength="6" autocomplete="new-password">
 </div>
+
+<button class="primary full" id="authSubmit" type="submit">Sign in</button>
+</form>
+
+<button class="secondary full" id="signupBtn" type="button">Create an account</button>
+<button class="secondary full" id="forgotBtn" type="button">Forgot password?</button>
+<button class="secondary full" id="googleBtn" type="button">Continue with Google</button>
+<button class="secondary full hidden" id="backLoginBtn" type="button">Back to sign in</button>
+
+<p id="authMessage" class="small" role="status"></p>
+</div>
+
 
 <div id="ownerApp" class="hidden">
 <div class="row" style="margin-bottom:12px">
