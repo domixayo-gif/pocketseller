@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -15,6 +14,7 @@ header p{color:#c9ded2;margin:7px 0 0}
 main{max-width:760px;margin:auto;padding:14px}
 nav{display:flex;gap:7px;overflow:auto;margin-bottom:12px}
 button,.btn{border:0;border-radius:9px;padding:12px;cursor:pointer;font-weight:bold}
+button:disabled{opacity:.6;cursor:wait}
 nav button{white-space:nowrap;background:#dfe7e1}
 nav button.active,.primary{background:#205b43;color:white}
 .secondary{background:#e4eee7;color:#183d2c}
@@ -42,7 +42,7 @@ button.full{width:100%;margin-top:12px}
 a{color:#205b43;overflow-wrap:anywhere}
 footer{text-align:center;padding:22px;color:#637269;font-size:12px}
 .hidden{display:none!important}
-.notice{padding:11px;background:#edf4ef;border-radius:8px;margin:10px 0;line-height:1.5}
+.notice{padding:11px;background:#edf4ef;border-radius:8px;margin:10px 0;line-height:1.5;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -50,625 +50,266 @@ footer{text-align:center;padding:22px;color:#637269;font-size:12px}
 <h1>PocketSeller</h1>
 <p>Less typing. Faster replies. Easier bookings.</p>
 </header>
-
 <main>
 <div id="publicPage" class="hidden">
 <div class="card">
 <h2 id="publicTitle">Book an appointment</h2>
 <p id="publicInfo" class="small"></p>
 <form id="publicForm">
-<label>Your name</label>
-<input id="pName" required maxlength="80" autocomplete="name">
-<label>Choose a service</label>
-<select id="pService" required></select>
-<label>Preferred date</label>
-<input id="pDate" type="date" required>
+<label>Your name</label><input id="pName" required maxlength="80" autocomplete="name">
+<label>Choose a service</label><select id="pService" required></select>
+<label>Preferred date</label><input id="pDate" type="date" required>
 <label>Preferred time</label>
 <select id="pTime" required>
-<option value="">Choose a time</option>
-<option value="09:00">9:00 AM</option>
-<option value="10:00">10:00 AM</option>
-<option value="11:00">11:00 AM</option>
-<option value="12:00">12:00 PM</option>
-<option value="13:00">1:00 PM</option>
-<option value="14:00">2:00 PM</option>
-<option value="15:00">3:00 PM</option>
-<option value="16:00">4:00 PM</option>
-<option value="17:00">5:00 PM</option>
+<option value="">Choose a time</option><option value="09:00">9:00 AM</option><option value="10:00">10:00 AM</option><option value="11:00">11:00 AM</option><option value="12:00">12:00 PM</option><option value="13:00">1:00 PM</option><option value="14:00">2:00 PM</option><option value="15:00">3:00 PM</option><option value="16:00">4:00 PM</option><option value="17:00">5:00 PM</option>
 </select>
-<label>Contact number or social handle</label>
-<input id="pContact" required maxlength="100">
-<label>Additional notes (optional)</label>
-<textarea id="pNotes" maxlength="500"></textarea>
+<label>Contact number or social handle</label><input id="pContact" required maxlength="100">
+<label>Additional notes (optional)</label><textarea id="pNotes" maxlength="500"></textarea>
 <button class="primary full" type="submit">Send booking request</button>
 </form>
 <p class="small">Your request is recorded when submission succeeds. Your appointment is not confirmed until the business confirms it.</p>
-<div id="publicMessage" class="notice hidden"></div>
+<div id="publicMessage" class="notice hidden" role="status"></div>
 </div>
-<div class="card">
-<h3>Services and prices</h3>
-<div id="publicServices"></div>
+<div class="card"><h3>Services and prices</h3><div id="publicServices"></div></div>
 </div>
-</div>
-
 
 <div id="authCard" class="card">
 <h2 id="authTitle">Business owner sign-in</h2>
 <p id="authDescription" class="small">Sign in to manage your PocketSeller business and bookings.</p>
-
 <form id="authForm">
-<div id="authNameWrap" class="hidden">
-<label>Your name</label>
-<input id="authName" maxlength="80" autocomplete="name">
-</div>
-
-<label>Email address</label>
-<input id="authEmail" type="email" autocomplete="email" required>
-
-<label id="passwordLabel">Password</label>
-<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required>
-
-<div id="confirmPasswordWrap" class="hidden">
-<label>Confirm password</label>
-<input id="authPasswordConfirm" type="password" minlength="6" autocomplete="new-password">
-</div>
-
+<div id="authNameWrap" class="hidden"><label>Your name</label><input id="authName" maxlength="80" autocomplete="name"></div>
+<div id="authEmailWrap"><label>Email address</label><input id="authEmail" type="email" autocomplete="email" required></div>
+<div id="passwordWrap"><label id="passwordLabel">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required></div>
+<div id="confirmPasswordWrap" class="hidden"><label>Confirm password</label><input id="authPasswordConfirm" type="password" minlength="6" autocomplete="new-password"></div>
 <button class="primary full" id="authSubmit" type="submit">Sign in</button>
 </form>
-
 <button class="secondary full" id="signupBtn" type="button">Create an account</button>
 <button class="secondary full" id="forgotBtn" type="button">Forgot password?</button>
 <button class="secondary full" id="googleBtn" type="button">Continue with Google</button>
 <button class="secondary full hidden" id="backLoginBtn" type="button">Back to sign in</button>
-
-<p id="authMessage" class="small" role="status"></p>
+<p id="authMessage" class="small" role="status" aria-live="polite"></p>
 </div>
-
 
 <div id="ownerApp" class="hidden">
-<div class="row" style="margin-bottom:12px">
-<span id="ownerEmail" class="small"></span>
-<button class="secondary" id="signoutBtn" type="button">Sign out</button>
-</div>
+<div class="row" style="margin-bottom:12px"><span id="ownerEmail" class="small"></span><button class="secondary" id="signoutBtn" type="button">Sign out</button></div>
 <nav>
-<button class="active" data-tab="home">Home</button>
-<button data-tab="setup">Business setup</button>
-<button data-tab="services">Services</button>
-<button data-tab="replies">Smart replies</button>
-<button data-tab="bookings">Bookings</button>
+<button class="active" data-tab="home">Home</button><button data-tab="setup">Business setup</button><button data-tab="services">Services</button><button data-tab="replies">Smart replies</button><button data-tab="bookings">Bookings</button>
 </nav>
-
 <section id="home" class="active">
-<div class="card">
-<h2 id="welcome">Welcome to PocketSeller</h2>
-<p class="small">Your business details and records are saved online in Supabase.</p>
-<div class="grid">
-<div class="metric">Services<strong id="mServices">0</strong></div>
-<div class="metric">Bookings<strong id="mBookings">0</strong></div>
-</div>
+<div class="card"><h2 id="welcome">Welcome to PocketSeller</h2><p class="small">Your business details and records are saved online in Supabase.</p>
+<div class="grid"><div class="metric">Services<strong id="mServices">0</strong></div><div class="metric">Bookings<strong id="mBookings">0</strong></div></div>
 <button class="primary full" id="shareBtn" type="button">Get my booking link</button>
-<div id="linkBox" class="hidden">
-<label>Your public booking link</label>
-<input id="bookingLink" readonly>
-<button class="secondary full" id="copyBtn" type="button">Copy booking link</button>
-<p class="small">Share this link with customers. They can choose a service and request an appointment.</p>
+<div id="linkBox" class="hidden"><label>Your public booking link</label><input id="bookingLink" readonly><button class="secondary full" id="copyBtn" type="button">Copy booking link</button><p class="small">Share this link with customers. They can choose a service and request an appointment.</p></div>
 </div>
-</div>
-<div class="card">
-<h2>Try a smart reply</h2>
-<label>Choose a customer question</label>
-<select id="question">
-<option>How much do you charge?</option>
-<option>Where are you located?</option>
-<option>What time do you open?</option>
-<option>How do I book?</option>
-<option>Do I need to pay a deposit?</option>
-<option>What services do you offer?</option>
-</select>
-<button class="primary full" id="previewBtn" type="button">Show suggested answer</button>
-<div id="preview" class="reply hidden" style="margin-top:12px"></div>
-</div>
+<div class="card"><h2>Try a smart reply</h2><label>Choose a customer question</label><select id="question"><option>How much do you charge?</option><option>Where are you located?</option><option>What time do you open?</option><option>How do I book?</option><option>Do I need to pay a deposit?</option><option>What services do you offer?</option></select><button class="primary full" id="previewBtn" type="button">Show suggested answer</button><div id="preview" class="reply hidden" style="margin-top:12px"></div></div>
 </section>
-
-<section id="setup">
-<div class="card">
-<h2>Quick business setup</h2>
-<form id="bizForm">
-<label>Business name</label>
-<input id="bizName" required maxlength="80">
-<label>Business type</label>
-<select id="bizType">
-<option>Hairstylist / Wig installer</option>
-<option>Barber</option>
-<option>Nail technician</option>
-<option>Makeup artist</option>
-<option>Fashion designer</option>
-<option>Other service business</option>
-</select>
-<label>Location</label>
-<input id="bizLocation" maxlength="180">
-<label>Opening hours</label>
-<input id="bizHours" maxlength="120">
-<label>WhatsApp number</label>
-<input id="bizPhone" inputmode="numeric" maxlength="20" placeholder="2348012345678">
+<section id="setup"><div class="card"><h2>Quick business setup</h2><form id="bizForm">
+<label>Business name</label><input id="bizName" required maxlength="80">
+<label>Business type</label><select id="bizType"><option>Hairstylist / Wig installer</option><option>Barber</option><option>Nail technician</option><option>Makeup artist</option><option>Fashion designer</option><option>Other service business</option></select>
+<label>Location</label><input id="bizLocation" maxlength="180">
+<label>Opening hours</label><input id="bizHours" maxlength="120">
+<label>WhatsApp number</label><input id="bizPhone" inputmode="numeric" maxlength="20" placeholder="2348012345678">
 <p class="small">Use country code and digits only. For Nigeria, start with 234 and omit the first zero.</p>
-<label>Deposit and booking policy</label>
-<textarea id="bizPolicy" maxlength="500"></textarea>
-<button class="primary full" type="submit">Save business setup</button>
-</form>
-<p id="bizMessage" class="small"></p>
-</div>
-</section>
-
-<section id="services">
-<div class="card">
-<h2>Add a service</h2>
-<form id="serviceForm">
-<label>Service name</label>
-<input id="sName" required maxlength="100">
-<label>Price in naira</label>
-<input id="sPrice" required type="number" min="0" step="1">
-<label>Extra details (optional)</label>
-<input id="sNote" maxlength="180">
-<button class="primary full" type="submit">Add service</button>
-</form>
-</div>
-<div class="card">
-<h2>Your services</h2>
-<div id="serviceList"></div>
-</div>
-</section>
-
-<section id="replies">
-<div class="card">
-<h2>Suggested answers</h2>
-<p class="small">Review these answers before sending them to customers.</p>
-<div id="replyList"></div>
-</div>
-</section>
-
-<section id="bookings">
-<div class="card">
-<h2>Record a booking</h2>
-<form id="bookingForm">
-<label>Customer name</label>
-<input id="bName" required maxlength="80">
-<label>Service</label>
-<input id="bService" required maxlength="100">
-<label>Appointment date</label>
-<input id="bDate" type="date" required>
-<label>Total price (₦)</label>
-<input id="bPrice" type="number" min="0" step="1" required>
-<label>Deposit paid (₦)</label>
-<input id="bPaid" type="number" min="0" step="1" value="0" required>
-<button class="primary full" type="submit">Record booking</button>
-</form>
-<p id="bookingMessage" class="small"></p>
-</div>
-<div class="card">
-<h2>Saved bookings</h2>
-<div id="bookingList"></div>
-</div>
-</section>
-</div>
+<label>Deposit and booking policy</label><textarea id="bizPolicy" maxlength="500"></textarea><button class="primary full" type="submit">Save business setup</button></form><p id="bizMessage" class="small" role="status"></p></div></section>
+<section id="services"><div class="card"><h2>Add a service</h2><form id="serviceForm"><label>Service name</label><input id="sName" required maxlength="100"><label>Price in naira</label><input id="sPrice" required type="number" min="0" step="1"><label>Extra details (optional)</label><input id="sNote" maxlength="180"><button class="primary full" type="submit">Add service</button></form></div><div class="card"><h2>Your services</h2><div id="serviceList"></div></div></section>
+<section id="replies"><div class="card"><h2>Suggested answers</h2><p class="small">Review these answers before sending them to customers.</p><div id="replyList"></div></div></section>
+<section id="bookings"><div class="card"><h2>Record a booking</h2><form id="bookingForm"><label>Customer name</label><input id="bName" required maxlength="80"><label>Service</label><input id="bService" required maxlength="100"><label>Appointment date</label><input id="bDate" type="date" required><label>Total price (₦)</label><input id="bPrice" type="number" min="0" step="1" required><label>Deposit paid (₦)</label><input id="bPaid" type="number" min="0" step="1" value="0" required><button class="primary full" type="submit">Record booking</button></form><p id="bookingMessage" class="small" role="status"></p></div><div class="card"><h2>Saved bookings</h2><div id="bookingList"></div></div></section>
 </div>
 </main>
 <footer>PocketSeller · Simple tools for small businesses</footer>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
 "use strict";
-
 var SUPABASE_URL="https://nqfkmjevzuhpckxdhrdh.supabase.co";
 var SUPABASE_KEY="sb_publishable_F_au0_jD6Mll9_It3PHmvg_SGM4KdND";
 var db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-var business=null;
-var services=[];
-var bookings=[];
-var user=null;
-var publicSlug=new URLSearchParams(location.search).get("slug")||"";
-var isPublic=new URLSearchParams(location.search).get("book")==="1";
-
+var business=null,services=[],bookings=[],user=null,authMode="signin";
+var params=new URLSearchParams(location.search);
+var publicSlug=params.get("slug")||"";
+var isPublic=params.get("book")==="1";
 function $(id){return document.getElementById(id);}
 function money(n){return "₦"+Number(n||0).toLocaleString("en-NG");}
-function esc(s){
-return String(s==null?"":s)
-.replace(/&/g,"&amp;").replace(/</g,"&lt;")
-.replace(/>/g,"&gt;").replace(/"/g,"&quot;")
-.replace(/'/g,"&#39;");
-}
-function message(id,text){$(id).textContent=text;}
-function slugify(s){
-var base=String(s||"business").toLowerCase()
-.replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
-return (base||"business")+"-"+Math.random().toString(36).slice(2,8);
-}
-function phoneNumber(){
-return String(business&&business.whatsapp_number||"").replace(/\D/g,"");
-}
-function waLink(text){
-var phone=phoneNumber();
-if(!phone)return "";
-return "https://wa.me/"+phone+"?text="+encodeURIComponent(text);
-}
-function bookingUrl(){
-if(!business||!business.public_slug)return "";
-return location.href.split("?")[0]+"?book=1&slug="+encodeURIComponent(business.public_slug);
-}
-function switchTab(name){
-document.querySelectorAll("#ownerApp section").forEach(function(s){
-s.classList.toggle("active",s.id===name);
-});
-document.querySelectorAll("#ownerApp nav button").forEach(function(b){
-b.classList.toggle("active",b.dataset.tab===name);
-});
-}
-document.querySelectorAll("nav button").forEach(function(b){
-b.addEventListener("click",function(){switchTab(b.dataset.tab);});
-});
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function message(id,text){var el=$(id);if(el)el.textContent=text;}
+function slugify(s){var base=String(s||"business").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");return (base||"business")+"-"+Math.random().toString(36).slice(2,8);}
+function phoneNumber(){return String(business&&business.whatsapp_number||"").replace(/\D/g,"");}
+function waLink(text){var phone=phoneNumber();if(!phone)return "";return "https://wa.me/"+phone+"?text="+encodeURIComponent(text);}
+function bookingUrl(){if(!business||!business.public_slug)return "";return location.href.split("?")[0]+"?book=1&slug="+encodeURIComponent(business.public_slug);}
+function siteRedirect(){return location.origin+location.pathname;}
+function switchTab(name){document.querySelectorAll("#ownerApp section").forEach(function(s){s.classList.toggle("active",s.id===name);});document.querySelectorAll("#ownerApp nav button").forEach(function(b){b.classList.toggle("active",b.dataset.tab===name);});}
+document.querySelectorAll("#ownerApp nav button").forEach(function(b){b.addEventListener("click",function(){switchTab(b.dataset.tab);});});
 
+function setAuthMode(mode){
+ authMode=mode;
+ var signIn=mode==="signin",signUp=mode==="signup",forgot=mode==="forgot",reset=mode==="reset";
+ $("authCard").classList.remove("hidden");
+ $("authTitle").textContent=signIn?"Business owner sign-in":signUp?"Create your PocketSeller account":forgot?"Reset your password":"Choose a new password";
+ $("authDescription").textContent=signIn?"Sign in to manage your PocketSeller business and bookings.":signUp?"Create an account to set up your business.":forgot?"Enter your email and we will send you a password reset link.":"Enter and confirm your new password.";
+ $("authNameWrap").classList.toggle("hidden",!signUp);
+ $("confirmPasswordWrap").classList.toggle("hidden",!(signUp||reset));
+ $("passwordWrap").classList.toggle("hidden",forgot);
+ $("authName").required=signUp;
+ $("authPassword").required=!forgot;
+ $("authPasswordConfirm").required=signUp||reset;
+ $("authPassword").autocomplete=reset||signUp?"new-password":"current-password";
+ $("authEmail").disabled=reset;
+ $("authEmail").required=!reset;
+ $("authEmailWrap").classList.toggle("hidden",reset);
+ $("authSubmit").textContent=signIn?"Sign in":signUp?"Create account":forgot?"Send reset email":"Save new password";
+ $("signupBtn").classList.toggle("hidden",!signIn);
+ $("forgotBtn").classList.toggle("hidden",!signIn);
+ $("googleBtn").classList.toggle("hidden",!signIn);
+ $("backLoginBtn").classList.toggle("hidden",signIn);
+ message("authMessage","");
+}
+function showSignedOut(text){user=null;business=null;services=[];bookings=[];$("ownerApp").classList.add("hidden");if(!isPublic){$("authCard").classList.remove("hidden");setAuthMode("signin");if(text)message("authMessage",text);}}
 function answers(){
-var b=business||{};
-var prices=services.length?services.map(function(s){
-return s.name+": "+money(s.price);
-}).join("\n"):"Please contact us for our current prices.";
-return [
-["How much do you charge?","Hello! Thanks for contacting "+(b.business_name||"us")+". Our services and prices are:\n"+prices+"\nWhich service are you interested in?"],
-["Where are you located?",b.location?"Hello! "+(b.business_name||"We")+" are located at "+b.location+".":"Please message us to confirm our location."],
-["What time do you open?",b.hours?"Our opening hours are "+b.hours+".":"Please message us to confirm our opening hours."],
-["How do I book?","Please use our booking link to select a service, date and time. Your request will be sent to us for confirmation."],
-["Do I need to pay a deposit?",b.policy||"Please contact us to confirm our deposit and booking policy."],
-["What services do you offer?",prices]
-];
+ var b=business||{};
+ var prices=services.length?services.map(function(s){return s.name+": "+money(s.price);}).join("\n"):"Please contact us for our current prices.";
+ return [["How much do you charge?","Hello! Thanks for contacting "+(b.business_name||"us")+". Our services and prices are:\n"+prices+"\nWhich service are you interested in?"],["Where are you located?",b.location?"Hello! "+(b.business_name||"We")+" are located at "+b.location+".":"Please message us to confirm our location."],["What time do you open?",b.hours?"Our opening hours are "+b.hours+".":"Please message us to confirm our opening hours."],["How do I book?","Please use our booking link to select a service, date and time. Your request will be sent to us for confirmation."],["Do I need to pay a deposit?",b.policy||"Please contact us to confirm our deposit and booking policy."],["What services do you offer?",prices]];
 }
-function renderReplies(){
-var html="";
-answers().forEach(function(a){
-html+='<div class="item"><strong>'+esc(a[0])+'</strong><p class="reply">'+esc(a[1])+'</p><button class="secondary" type="button" data-copy-reply="'+encodeURIComponent(a[1])+'">Copy answer</button></div>';
-});
-$("replyList").innerHTML=html;
-}
+function renderReplies(){var html="";answers().forEach(function(a){html+='<div class="item"><strong>'+esc(a[0])+'</strong><p class="reply">'+esc(a[1])+'</p><button class="secondary" type="button" data-copy-reply="'+encodeURIComponent(a[1])+'">Copy answer</button></div>';});$("replyList").innerHTML=html;}
 function renderServices(){
-$("mServices").textContent=services.length;
-if(!services.length){
-$("serviceList").innerHTML='<div class="empty">No services yet. Add your first service above.</div>';
-return;
-}
-var html="";
-services.forEach(function(s){
-html+='<div class="item"><div class="row"><strong>'+esc(s.name)+'</strong><span class="tag">'+money(s.price)+'</span></div>';
-if(s.note||s.description)html+='<p class="small">'+esc(s.note||s.description)+'</p>';
-html+='<button class="danger" type="button" data-delete-service="'+esc(s.id)+'">Delete</button></div>';
-});
-$("serviceList").innerHTML=html;
+ $("mServices").textContent=services.length;
+ if(!services.length){$("serviceList").innerHTML='<div class="empty">No services yet. Add your first service above.</div>';return;}
+ var html="";services.forEach(function(s){html+='<div class="item"><div class="row"><strong>'+esc(s.name)+'</strong><span class="tag">'+money(s.price)+'</span></div>';if(s.note||s.description)html+='<p class="small">'+esc(s.note||s.description)+'</p>';html+='<button class="danger" type="button" data-delete-service="'+esc(s.id)+'">Delete</button></div>';});$("serviceList").innerHTML=html;
 }
 function renderBookings(){
-$("mBookings").textContent=bookings.length;
-if(!bookings.length){
-$("bookingList").innerHTML='<div class="empty">No bookings recorded yet.</div>';
-return;
-}
-var html="";
-bookings.forEach(function(b){
-html+='<div class="item"><div class="row"><strong>'+esc(b.customer_name)+'</strong><span class="tag">'+esc(b.status||"pending")+'</span></div>';
-html+='<p class="small">'+esc(b.service_name||"Service")+' · '+esc(b.booking_date||"")+' · '+money(b.total_price)+'</p>';
-html+='<p class="small">Deposit: '+money(b.deposit_paid)+'</p>';
-html+='<div class="row"><button class="secondary" type="button" data-status-booking="'+esc(b.id)+'">Mark confirmed</button><button class="danger" type="button" data-delete-booking="'+esc(b.id)+'">Delete</button></div></div>';
-});
-$("bookingList").innerHTML=html;
+ $("mBookings").textContent=bookings.length;
+ if(!bookings.length){$("bookingList").innerHTML='<div class="empty">No bookings recorded yet.</div>';return;}
+ var html="";bookings.forEach(function(b){html+='<div class="item"><div class="row"><strong>'+esc(b.customer_name)+'</strong><span class="tag">'+esc(b.status||"pending")+'</span></div><p class="small">'+esc(b.service_name||"Service")+' · '+esc(b.booking_date||"")+' · '+money(b.total_price)+'</p><p class="small">Deposit: '+money(b.deposit_paid)+'</p><div class="row"><button class="secondary" type="button" data-status-booking="'+esc(b.id)+'">Mark confirmed</button><button class="danger" type="button" data-delete-booking="'+esc(b.id)+'">Delete</button></div></div>';});$("bookingList").innerHTML=html;
 }
 function render(){
-$("welcome").textContent="Welcome"+(business&&business.business_name?" to "+business.business_name:" to PocketSeller");
-$("bizName").value=business&&business.business_name||"";
-$("bizType").value=business&&business.business_type||"Hairstylist / Wig installer";
-$("bizLocation").value=business&&business.location||"";
-$("bizHours").value=business&&business.hours||"";
-$("bizPhone").value=business&&business.whatsapp_number||"";
-$("bizPolicy").value=business&&business.policy||"";
-renderServices();
-renderBookings();
-renderReplies();
+ $("welcome").textContent="Welcome"+(business&&business.business_name?" to "+business.business_name:" to PocketSeller");
+ $("bizName").value=business&&business.business_name||"";$("bizType").value=business&&business.business_type||"Hairstylist / Wig installer";$("bizLocation").value=business&&business.location||"";$("bizHours").value=business&&business.hours||"";$("bizPhone").value=business&&business.whatsapp_number||"";$("bizPolicy").value=business&&business.policy||"";
+ renderServices();renderBookings();renderReplies();
 }
 async function loadOwner(){
-if(!user)return;
-$("authCard").classList.add("hidden");
-$("ownerApp").classList.remove("hidden");
-$("ownerEmail").textContent=user.email||"Signed in";
-message("bizMessage","");
-var result=await db.from("businesses").select("*").eq("owner_id",user.id).limit(1);
-if(result.error){
-message("bizMessage","Could not load your business: "+result.error.message);
-return;
+ if(!user||isPublic)return;
+ $("authCard").classList.add("hidden");$("ownerApp").classList.remove("hidden");$("ownerEmail").textContent=user.email||"Signed in";message("bizMessage","");
+ var result=await db.from("businesses").select("*").eq("owner_id",user.id).limit(1);
+ if(result.error){message("bizMessage","Could not load your business: "+result.error.message);return;}
+ business=result.data&&result.data.length?result.data[0]:null;
+ if(business&&!business.public_slug){var newSlug=slugify(business.business_name);var upd=await db.from("businesses").update({public_slug:newSlug}).eq("id",business.id).select("*").single();if(!upd.error)business=upd.data;}
+ if(business){await loadServices();await loadBookings();render();}else{services=[];bookings=[];render();switchTab("setup");message("bizMessage","Save your business details to get started.");}
 }
-business=result.data&&result.data.length?result.data[0]:null;
-if(business&&!business.public_slug){
-var newSlug=slugify(business.business_name);
-var upd=await db.from("businesses").update({public_slug:newSlug}).eq("id",business.id).select("*").single();
-if(!upd.error)business=upd.data;
-}
-if(business){
-await loadServices();
-await loadBookings();
-render();
-}else{
-services=[];
-bookings=[];
-render();
-switchTab("setup");
-message("bizMessage","Save your business details to get started.");
-}
-}
-async function loadServices(){
-if(!business){services=[];return;}
-var r=await db.from("services").select("*").eq("business_id",business.id).order("created_at",{ascending:false});
-if(r.error){message("bizMessage","Could not load services: "+r.error.message);services=[];return;}
-services=r.data||[];
-}
-async function loadBookings(){
-if(!business){bookings=[];return;}
-var r=await db.from("bookings").select("*").eq("business_id",business.id).order("created_at",{ascending:false});
-if(r.error){message("bookingMessage","Could not load bookings: "+r.error.message);bookings=[];return;}
-bookings=r.data||[];
-}
+async function loadServices(){if(!business){services=[];return;}var r=await db.from("services").select("*").eq("business_id",business.id).order("created_at",{ascending:false});if(r.error){message("bizMessage","Could not load services: "+r.error.message);services=[];return;}services=r.data||[];}
+async function loadBookings(){if(!business){bookings=[];return;}var r=await db.from("bookings").select("*").eq("business_id",business.id).order("created_at",{ascending:false});if(r.error){message("bookingMessage","Could not load bookings: "+r.error.message);bookings=[];return;}bookings=r.data||[];}
 
 $("authForm").addEventListener("submit",async function(e){
-e.preventDefault();
-message("authMessage","Signing in...");
-var r=await db.auth.signInWithPassword({
-email:$("authEmail").value.trim(),
-password:$("authPassword").value
+ e.preventDefault();
+ var email=$("authEmail").value.trim(),password=$("authPassword").value;
+ if(authMode==="signin"){
+  message("authMessage","Signing in...");$("authSubmit").disabled=true;
+  try{var r=await db.auth.signInWithPassword({email:email,password:password});if(r.error){message("authMessage",r.error.message);return;}user=r.data.user;await loadOwner();}
+  catch(err){message("authMessage","Sign-in failed: "+(err.message||String(err)));}
+  finally{$("authSubmit").disabled=false;}
+  return;
+ }
+ if(authMode==="signup"){
+  var name=$("authName").value.trim(),confirm=$("authPasswordConfirm").value;
+  if(!name){message("authMessage","Enter your name.");return;}
+  if(password.length<6){message("authMessage","Use a password with at least 6 characters.");return;}
+  if(password!==confirm){message("authMessage","The passwords do not match.");return;}
+  message("authMessage","Creating your account...");$("authSubmit").disabled=true;
+  try{var s=await db.auth.signUp({email:email,password:password,options:{data:{full_name:name},emailRedirectTo:siteRedirect()}});if(s.error){message("authMessage",s.error.message);return;}if(s.data.session&&s.data.user){user=s.data.user;await loadOwner();}else{setAuthMode("signin");message("authMessage","Account created. Check your email for a confirmation link, then sign in.");}}
+  catch(err2){message("authMessage","Account creation failed: "+(err2.message||String(err2)));}
+  finally{$("authSubmit").disabled=false;}
+  return;
+ }
+ if(authMode==="forgot"){
+  if(!email){message("authMessage","Enter the email address for your account.");return;}
+  message("authMessage","Sending password reset email...");$("authSubmit").disabled=true;
+  try{var f=await db.auth.resetPasswordForEmail(email,{redirectTo:siteRedirect()});if(f.error){message("authMessage",f.error.message);return;}message("authMessage","If an account uses that email, a password reset link has been sent. Check your inbox and spam folder.");}
+  catch(err3){message("authMessage","Could not send reset email: "+(err3.message||String(err3)));}
+  finally{$("authSubmit").disabled=false;}
+  return;
+ }
+ if(authMode==="reset"){
+  var confirmNew=$("authPasswordConfirm").value;
+  if(password.length<6){message("authMessage","Use a password with at least 6 characters.");return;}
+  if(password!==confirmNew){message("authMessage","The passwords do not match.");return;}
+  message("authMessage","Updating your password...");$("authSubmit").disabled=true;
+  try{var u=await db.auth.updateUser({password:password});if(u.error){message("authMessage",u.error.message);return;}setAuthMode("signin");message("authMessage","Your password has been updated. You can now sign in with it.");}
+  catch(err4){message("authMessage","Could not update password: "+(err4.message||String(err4)));}
+  finally{$("authSubmit").disabled=false;}
+ }
 });
-if(r.error){message("authMessage",r.error.message);return;}
-user=r.data.user;
-await loadOwner();
+$("signupBtn").addEventListener("click",function(){setAuthMode("signup");});
+$("forgotBtn").addEventListener("click",function(){setAuthMode("forgot");});
+$("backLoginBtn").addEventListener("click",function(){setAuthMode("signin");});
+$("googleBtn").addEventListener("click",async function(){
+ message("authMessage","Connecting to Google...");
+ try{var r=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:siteRedirect()}});if(r.error)message("authMessage","Google sign-in is not configured yet in Supabase. You can still use email and password. Details: "+r.error.message);}
+ catch(err){message("authMessage","Google sign-in is not configured yet. You can still use email and password.");}
 });
-$("signupBtn").addEventListener("click",async function(){
-var email=$("authEmail").value.trim();
-var password=$("authPassword").value;
-if(!email||password.length<6){
-message("authMessage","Enter an email and a password of at least 6 characters.");
-return;
-}
-message("authMessage","Creating account...");
-var r=await db.auth.signUp({email:email,password:password});
-if(r.error){message("authMessage",r.error.message);return;}
-if(r.data.session){
-user=r.data.user;
-await loadOwner();
-}else{
-message("authMessage","Account created. Check your email to confirm it, then sign in.");
-}
-});
-$("signoutBtn").addEventListener("click",async function(){
-await db.auth.signOut();
-user=null;business=null;services=[];bookings=[];
-$("ownerApp").classList.add("hidden");
-$("authCard").classList.remove("hidden");
-message("authMessage","You have signed out.");
-});
+$("signoutBtn").addEventListener("click",async function(){try{await db.auth.signOut();}catch(e){}showSignedOut("You have signed out.");});
+
 $("bizForm").addEventListener("submit",async function(e){
-e.preventDefault();
-if(!user){message("bizMessage","Please sign in first.");return;}
-var fields={
-business_name:$("bizName").value.trim(),
-business_type:$("bizType").value,
-location:$("bizLocation").value.trim(),
-hours:$("bizHours").value.trim(),
-whatsapp_number:$("bizPhone").value.replace(/\D/g,""),
-policy:$("bizPolicy").value.trim()
-};
-if(!fields.business_name){message("bizMessage","Enter your business name.");return;}
-if(!business)fields.public_slug=slugify(fields.business_name);
-message("bizMessage","Saving business details...");
-var r;
-if(business){
-r=await db.from("businesses").update(fields).eq("id",business.id).eq("owner_id",user.id).select("*").single();
-}else{
-fields.owner_id=user.id;
-r=await db.from("businesses").insert(fields).select("*").single();
-}
-if(r.error){message("bizMessage","Save failed: "+r.error.message);return;}
-business=r.data;
-render();
-message("bizMessage","Business details saved successfully.");
+ e.preventDefault();if(!user){message("bizMessage","Please sign in first.");return;}
+ var fields={business_name:$("bizName").value.trim(),business_type:$("bizType").value,location:$("bizLocation").value.trim(),hours:$("bizHours").value.trim(),whatsapp_number:$("bizPhone").value.replace(/\D/g,""),policy:$("bizPolicy").value.trim()};
+ if(!fields.business_name){message("bizMessage","Enter your business name.");return;}if(!business)fields.public_slug=slugify(fields.business_name);
+ message("bizMessage","Saving business details...");var r;
+ try{if(business){r=await db.from("businesses").update(fields).eq("id",business.id).eq("owner_id",user.id).select("*").single();}else{fields.owner_id=user.id;r=await db.from("businesses").insert(fields).select("*").single();}}
+ catch(err){message("bizMessage","Save failed: "+(err.message||String(err)));return;}
+ if(r.error){message("bizMessage","Save failed: "+r.error.message);return;}business=r.data;render();message("bizMessage","Business details saved successfully.");
 });
 $("serviceForm").addEventListener("submit",async function(e){
-e.preventDefault();
-if(!business){alert("Save your business setup first.");return;}
-var price=Number($("sPrice").value);
-if(!Number.isFinite(price)||price<0){alert("Enter a valid price.");return;}
-var item={
-business_id:business.id,
-name:$("sName").value.trim(),
-description:$("sNote").value.trim(),
-note:$("sNote").value.trim(),
-price:price,
-duration_minutes:30,
-active:true
-};
-var r=await db.from("services").insert(item);
-if(r.error){alert("Could not save service: "+r.error.message);return;}
-$("serviceForm").reset();
-await loadServices();
-render();
+ e.preventDefault();if(!business){alert("Save your business setup first.");return;}var price=Number($("sPrice").value);if(!Number.isFinite(price)||price<0){alert("Enter a valid price.");return;}
+ var item={business_id:business.id,name:$("sName").value.trim(),description:$("sNote").value.trim(),note:$("sNote").value.trim(),price:price,duration_minutes:30,active:true};
+ var r=await db.from("services").insert(item);if(r.error){alert("Could not save service: "+r.error.message);return;}$("serviceForm").reset();await loadServices();render();
 });
 $("bookingForm").addEventListener("submit",async function(e){
-e.preventDefault();
-if(!business){alert("Save your business setup first.");return;}
-var price=Number($("bPrice").value);
-var paid=Number($("bPaid").value);
-if(price<0||paid<0){alert("Amounts cannot be negative.");return;}
-if(paid>price){alert("Deposit cannot exceed the total price.");return;}
-var r=await db.from("bookings").insert({
-business_id:business.id,
-customer_name:$("bName").value.trim(),
-service_name:$("bService").value.trim(),
-booking_date:$("bDate").value,
-booking_time:"12:00",
-total_price:price,
-deposit_paid:paid,
-status:"pending"
+ e.preventDefault();if(!business){alert("Save your business setup first.");return;}var price=Number($("bPrice").value),paid=Number($("bPaid").value);if(price<0||paid<0){alert("Amounts cannot be negative.");return;}if(paid>price){alert("Deposit cannot exceed the total price.");return;}
+ var r=await db.from("bookings").insert({business_id:business.id,customer_name:$("bName").value.trim(),service_name:$("bService").value.trim(),booking_date:$("bDate").value,booking_time:"12:00",total_price:price,deposit_paid:paid,status:"pending"});
+ if(r.error){message("bookingMessage","Could not record booking: "+r.error.message);return;}$("bookingForm").reset();$("bPaid").value="0";await loadBookings();render();message("bookingMessage","Booking recorded successfully.");
 });
-if(r.error){message("bookingMessage","Could not record booking: "+r.error.message);return;}
-$("bookingForm").reset();
-$("bPaid").value="0";
-await loadBookings();
-render();
-message("bookingMessage","Booking recorded successfully.");
-});
-$("shareBtn").addEventListener("click",function(){
-if(!business){alert("Save your business setup first.");return;}
-var url=bookingUrl();
-if(!url){alert("Save your business details first.");return;}
-$("bookingLink").value=url;
-$("linkBox").classList.remove("hidden");
-});
-$("copyBtn").addEventListener("click",async function(){
-var input=$("bookingLink");
-input.select();
-try{
-await navigator.clipboard.writeText(input.value);
-alert("Booking link copied.");
-}catch(e){
-alert("Select the link and copy it manually.");
-}
-});
-$("previewBtn").addEventListener("click",function(){
-var list=answers();
-var q=$("question").value;
-var found=list.find(function(a){return a[0]===q;});
-$("preview").textContent=found?found[1]:"";
-$("preview").classList.remove("hidden");
-});
+$("shareBtn").addEventListener("click",function(){if(!business){alert("Save your business setup first.");return;}var url=bookingUrl();if(!url){alert("Save your business details first.");return;}$("bookingLink").value=url;$("linkBox").classList.remove("hidden");});
+$("copyBtn").addEventListener("click",async function(){var input=$("bookingLink");input.select();try{await navigator.clipboard.writeText(input.value);alert("Booking link copied.");}catch(e){window.prompt("Select and copy your booking link:",input.value);}});
+$("previewBtn").addEventListener("click",function(){var list=answers(),q=$("question").value,found=list.find(function(a){return a[0]===q;});$("preview").textContent=found?found[1]:"";$("preview").classList.remove("hidden");});
 document.addEventListener("click",async function(e){
-var copy=e.target.closest("[data-copy-reply]");
-if(copy){
-var value=decodeURIComponent(copy.getAttribute("data-copy-reply"));
-try{await navigator.clipboard.writeText(value);alert("Answer copied.");}
-catch(err){window.prompt("Copy this answer:",value);}
-return;
-}
-var delService=e.target.closest("[data-delete-service]");
-if(delService){
-if(!confirm("Delete this service?"))return;
-var r=await db.from("services").delete().eq("id",delService.getAttribute("data-delete-service")).eq("business_id",business.id);
-if(r.error){alert("Delete failed: "+r.error.message);return;}
-await loadServices();render();return;
-}
-var confirmBooking=e.target.closest("[data-status-booking]");
-if(confirmBooking){
-var r2=await db.from("bookings").update({status:"confirmed"}).eq("id",confirmBooking.getAttribute("data-status-booking")).eq("business_id",business.id);
-if(r2.error){alert("Could not update booking: "+r2.error.message);return;}
-await loadBookings();render();return;
-}
-var delBooking=e.target.closest("[data-delete-booking]");
-if(delBooking){
-if(!confirm("Delete this booking record?"))return;
-var r3=await db.from("bookings").delete().eq("id",delBooking.getAttribute("data-delete-booking")).eq("business_id",business.id);
-if(r3.error){alert("Delete failed: "+r3.error.message);return;}
-await loadBookings();render();
-}
+ var copy=e.target.closest("[data-copy-reply]");if(copy){var value=decodeURIComponent(copy.getAttribute("data-copy-reply"));try{await navigator.clipboard.writeText(value);alert("Answer copied.");}catch(err){window.prompt("Copy this answer:",value);}return;}
+ var delService=e.target.closest("[data-delete-service]");if(delService){if(!confirm("Delete this service?"))return;var r=await db.from("services").delete().eq("id",delService.getAttribute("data-delete-service")).eq("business_id",business.id);if(r.error){alert("Delete failed: "+r.error.message);return;}await loadServices();render();return;}
+ var confirmBooking=e.target.closest("[data-status-booking]");if(confirmBooking){var r2=await db.from("bookings").update({status:"confirmed"}).eq("id",confirmBooking.getAttribute("data-status-booking")).eq("business_id",business.id);if(r2.error){alert("Could not update booking: "+r2.error.message);return;}await loadBookings();render();return;}
+ var delBooking=e.target.closest("[data-delete-booking]");if(delBooking){if(!confirm("Delete this booking record?"))return;var r3=await db.from("bookings").delete().eq("id",delBooking.getAttribute("data-delete-booking")).eq("business_id",business.id);if(r3.error){alert("Delete failed: "+r3.error.message);return;}await loadBookings();render();}
 });
 
 async function loadPublic(){
-$("adminPage").classList.add("hidden");
-$("publicPage").classList.remove("hidden");
-$("pDate").min=new Date().toLocaleDateString("en-CA");
-if(!publicSlug){
-$("publicTitle").textContent="Booking link missing";
-$("publicInfo").textContent="Please use the complete booking link provided by the business.";
-$("publicForm").classList.add("hidden");
-return;
-}
-var br=await db.rpc("get_public_business_for_booking",{p_slug:publicSlug});
-if(br.error){
-$("publicInfo").textContent="Could not load this business. Please try again later.";
-$("publicForm").classList.add("hidden");
-return;
-}
-var b=Array.isArray(br.data)?br.data[0]:br.data;
-if(!b){
-$("publicTitle").textContent="Business not found";
-$("publicInfo").textContent="This booking link may be incorrect or no longer active.";
-$("publicForm").classList.add("hidden");
-return;
-}
-business=b;
-$("publicTitle").textContent="Book with "+b.business_name;
-$("publicInfo").textContent=[b.location,b.hours].filter(Boolean).join(" · ");
-var sr=await db.rpc("get_public_services_for_booking",{p_slug:publicSlug});
-if(sr.error){
-$("publicInfo").textContent+=" Services could not be loaded.";
-return;
-}
-services=sr.data||[];
-var opts='<option value="">Choose a service</option>';
-var cards="";
-services.forEach(function(s){
-opts+='<option value="'+esc(s.id)+'">'+esc(s.name)+' — '+money(s.price)+'</option>';
-cards+='<div class="item"><strong>'+esc(s.name)+'</strong><p>'+money(s.price)+'</p>';
-if(s.description||s.note)cards+='<p class="small">'+esc(s.note||s.description)+'</p>';
-cards+='</div>';
-});
-$("pService").innerHTML=opts;
-$("publicServices").innerHTML=cards||'<p class="empty">No services are currently available.</p>';
-if(!services.length)$("publicForm").classList.add("hidden");
+ $("authCard").classList.add("hidden");$("ownerApp").classList.add("hidden");$("publicPage").classList.remove("hidden");
+ var today=new Date();var yyyy=today.getFullYear(),mm=String(today.getMonth()+1).padStart(2,"0"),dd=String(today.getDate()).padStart(2,"0");$("pDate").min=yyyy+"-"+mm+"-"+dd;
+ if(!publicSlug){$("publicTitle").textContent="Booking link missing";$("publicInfo").textContent="Please use the complete booking link provided by the business.";$("publicForm").classList.add("hidden");return;}
+ var br=await db.rpc("get_public_business_for_booking",{p_slug:publicSlug});if(br.error){$("publicInfo").textContent="Could not load this business. Please try again later.";$("publicForm").classList.add("hidden");return;}
+ var b=Array.isArray(br.data)?br.data[0]:br.data;if(!b){$("publicTitle").textContent="Business not found";$("publicInfo").textContent="This booking link may be incorrect or no longer active.";$("publicForm").classList.add("hidden");return;}
+ business=b;$("publicTitle").textContent="Book with "+b.business_name;$("publicInfo").textContent=[b.location,b.hours].filter(Boolean).join(" · ");
+ var sr=await db.rpc("get_public_services_for_booking",{p_slug:publicSlug});if(sr.error){$("publicInfo").textContent+=" Services could not be loaded.";return;}services=sr.data||[];
+ var opts='<option value="">Choose a service</option>',cards="";services.forEach(function(s){opts+='<option value="'+esc(s.id)+'">'+esc(s.name)+' — '+money(s.price)+'</option>';cards+='<div class="item"><strong>'+esc(s.name)+'</strong><p>'+money(s.price)+'</p>';if(s.description||s.note)cards+='<p class="small">'+esc(s.note||s.description)+'</p>';cards+='</div>';});
+ $("pService").innerHTML=opts;$("publicServices").innerHTML=cards||'<p class="empty">No services are currently available.</p>';if(!services.length)$("publicForm").classList.add("hidden");
 }
 $("publicForm").addEventListener("submit",async function(e){
-e.preventDefault();
-if(!business||!services.length)return;
-var selected=services.find(function(s){return s.id===$("pService").value;});
-if(!selected){alert("Please choose a service.");return;}
-var date=$("pDate").value;
-if(!date||date<$("pDate").min){alert("Please choose today or a future date.");return;}
-var contact=$("pContact").value.trim();
-var notes=$("pNotes").value.trim();
-var button=$("publicForm").querySelector("button[type=submit]");
-button.disabled=true;
-button.textContent="Sending request...";
-var r=await db.rpc("submit_public_booking",{
-p_slug:publicSlug,
-p_service_id:selected.id,
-p_customer_name:$("pName").value.trim(),
-p_customer_phone:contact,
-p_booking_date:date,
-p_booking_time:$("pTime").value,
-p_notes:notes
-});
-button.disabled=false;
-button.textContent="Send booking request";
-if(r.error){
-$("publicMessage").textContent="Booking could not be saved: "+r.error.message;
-$("publicMessage").classList.remove("hidden");
-return;
-}
-var text="Hello, I have submitted a booking request.\nName: "+$("pName").value.trim()+"\nService: "+selected.name+"\nPrice: "+money(selected.price)+"\nDate: "+date+"\nTime: "+$("pTime").selectedOptions[0].text+"\nContact: "+contact+(notes?"\nNotes: "+notes:"")+"\nPlease confirm availability.";
-var link=waLink(text);
-$("publicMessage").textContent="Your request has been recorded. "+(link?"Opening WhatsApp so you can contact the business.":"Please contact the business to confirm your appointment.");
-$("publicMessage").classList.remove("hidden");
-if(link)location.href=link;
+ e.preventDefault();if(!business||!services.length)return;var selected=services.find(function(s){return String(s.id)===String($("pService").value);});if(!selected){alert("Please choose a service.");return;}
+ var date=$("pDate").value;if(!date||date<$("pDate").min){alert("Please choose today or a future date.");return;}var contact=$("pContact").value.trim(),notes=$("pNotes").value.trim(),button=$("publicForm").querySelector("button[type=submit]");button.disabled=true;button.textContent="Sending request...";
+ try{var r=await db.rpc("submit_public_booking",{p_slug:publicSlug,p_service_id:selected.id,p_customer_name:$("pName").value.trim(),p_customer_phone:contact,p_booking_date:date,p_booking_time:$("pTime").value,p_notes:notes});
+  if(r.error){$("publicMessage").textContent="Booking could not be saved: "+r.error.message;$("publicMessage").classList.remove("hidden");return;}
+  var timeText=$("pTime").selectedOptions[0]?$("pTime").selectedOptions[0].text:$("pTime").value;var text="Hello, I have submitted a booking request.\nName: "+$("pName").value.trim()+"\nService: "+selected.name+"\nPrice: "+money(selected.price)+"\nDate: "+date+"\nTime: "+timeText+"\nContact: "+contact+(notes?"\nNotes: "+notes:"")+"\nPlease confirm availability.";var link=waLink(text);
+  $("publicMessage").textContent="Your request has been recorded. "+(link?"Opening WhatsApp so you can contact the business.":"Please contact the business to confirm your appointment.");$("publicMessage").classList.remove("hidden");if(link)location.href=link;
+ }catch(err){$("publicMessage").textContent="Booking failed: "+(err.message||String(err));$("publicMessage").classList.remove("hidden");}
+ finally{button.disabled=false;button.textContent="Send booking request";}
 });
 
 async function start(){
-if(isPublic){await loadPublic();return;}
-var r=await db.auth.getSession();
-if(r.data&&r.data.session){
-user=r.data.session.user;
-await loadOwner();
+ if(isPublic){await loadPublic();return;}
+ db.auth.onAuthStateChange(function(event,session){
+  window.setTimeout(function(){
+   if(event==="PASSWORD_RECOVERY"){$("ownerApp").classList.add("hidden");setAuthMode("reset");message("authMessage","Choose a new password for your account.");return;}
+   if(event==="SIGNED_OUT"){showSignedOut("");return;}
+   if(event==="SIGNED_IN"&&session&&session.user&&!user){user=session.user;loadOwner();}
+  },0);
+ });
+ var r=await db.auth.getSession();if(r.error){message("authMessage","Could not check your session: "+r.error.message);return;}if(r.data&&r.data.session){user=r.data.session.user;await loadOwner();}else{setAuthMode("signin");}
 }
-db.auth.onAuthStateChange(function(event,session){
-if(event==="SIGNED_OUT"){
-user=null;business=null;services=[];bookings=[];
-$("ownerApp").classList.add("hidden");
-$("authCard").classList.remove("hidden");
-}else if(session&&session.user&&!user){
-user=session.user;
-setTimeout(function(){loadOwner();},0);
-}
-});
-}
-start();
+setAuthMode("signin");
+start().catch(function(err){if(!isPublic)message("authMessage","PocketSeller could not start: "+(err.message||String(err)));else message("publicInfo","Could not load the booking page. Please try again.");});
 })();
 </script>
 </body>
