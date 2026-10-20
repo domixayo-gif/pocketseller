@@ -1,65 +1,1553 @@
+
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10251d"><title>PocketSeller</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10251d">
+<title>PocketSeller</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f6f4;color:#17251f;font:16px Arial,sans-serif}header{background:#10251d;color:white;padding:20px 16px}header h1{margin:0;font-size:26px}header p{color:#c9ded2;margin:7px 0 0}main{max-width:760px;margin:auto;padding:14px}nav{display:flex;gap:7px;overflow:auto;margin-bottom:12px}button,.btn{border:0;border-radius:9px;padding:12px;cursor:pointer;font-weight:bold}button:disabled{opacity:.5;cursor:not-allowed}nav button{white-space:nowrap;background:#dfe7e1}nav button.active,.primary{background:#205b43;color:white}.secondary{background:#e4eee7;color:#183d2c}.danger{background:#f8e4e4;color:#8b2020}section{display:none}section.active{display:block}.card{background:white;border:1px solid #dce5df;border-radius:13px;padding:16px;margin-bottom:12px}h2{font-size:20px;margin:0 0 12px}h3{font-size:16px}label{display:block;font-size:13px;font-weight:bold;margin:12px 0 5px}input,textarea,select{width:100%;padding:12px;border:1px solid #cbd7ce;border-radius:8px;font:inherit;background:white}textarea{min-height:70px}form button{margin-top:14px}button.full{width:100%;margin-top:12px}.small{font-size:13px;color:#637269;line-height:1.5}.metric{background:#edf4ef;padding:13px;border-radius:10px}.metric strong{display:block;font-size:23px;margin-top:5px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.item{border-top:1px solid #e4eae5;padding:12px 0;overflow-wrap:anywhere}.row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.reply{white-space:pre-wrap;background:#f0f5f1;padding:12px;border-left:3px solid #205b43;border-radius:6px;line-height:1.5;overflow-wrap:anywhere}.tag{font-size:12px;background:#e3eee6;border-radius:20px;padding:5px 8px}.empty{padding:12px 0;color:#738077}a{color:#205b43;overflow-wrap:anywhere}footer{text-align:center;padding:22px;color:#637269;font-size:12px}.hidden{display:none!important}.notice{padding:11px;background:#edf4ef;border-radius:8px;margin:10px 0;line-height:1.5;overflow-wrap:anywhere}.locked{background:#fff4df;color:#6c4a0a}.good{background:#e4f5e8;color:#16552a}
-</style></head><body>
-<header><h1>PocketSeller</h1><p>Less typing. Faster replies. Easier bookings.</p></header><main>
-<div id="publicPage" class="hidden"><div class="card"><h2 id="publicTitle">Book an appointment</h2><p id="publicInfo" class="small"></p><form id="publicForm"><label>Your name</label><input id="pName" required maxlength="80" autocomplete="name"><label>Choose a service</label><select id="pService" required></select><label>Preferred date</label><input id="pDate" type="date" required><label>Preferred time</label><select id="pTime" required><option value="">Choose a time</option><option value="09:00">9:00 AM</option><option value="10:00">10:00 AM</option><option value="11:00">11:00 AM</option><option value="12:00">12:00 PM</option><option value="13:00">1:00 PM</option><option value="14:00">2:00 PM</option><option value="15:00">3:00 PM</option><option value="16:00">4:00 PM</option><option value="17:00">5:00 PM</option></select><label>Contact number or social handle</label><input id="pContact" required maxlength="100"><label>Additional notes (optional)</label><textarea id="pNotes" maxlength="500"></textarea><button class="primary full" type="submit">Send booking request</button></form><p class="small">Your appointment is not confirmed until the business confirms it.</p><div id="publicMessage" class="notice hidden" role="status"></div></div><div class="card"><h3>Services and prices</h3><div id="publicServices"></div></div></div>
-<div id="authCard" class="card"><h2 id="authTitle">Business owner sign-in</h2><p id="authDescription" class="small">Sign in to manage your PocketSeller business and bookings.</p><form id="authForm"><div id="authNameWrap" class="hidden"><label>Your name</label><input id="authName" maxlength="80" autocomplete="name"></div><div id="authEmailWrap"><label>Email address</label><input id="authEmail" type="email" autocomplete="email" required></div><div id="passwordWrap"><label id="passwordLabel">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required></div><div id="confirmPasswordWrap" class="hidden"><label>Confirm password</label><input id="authPasswordConfirm" type="password" minlength="6" autocomplete="new-password"></div><button class="primary full" id="authSubmit" type="submit">Sign in</button></form><button class="secondary full" id="signupBtn" type="button">Create an account</button><button class="secondary full" id="forgotBtn" type="button">Forgot password?</button><button class="secondary full" id="googleBtn" type="button">Continue with Google</button><button class="secondary full hidden" id="backLoginBtn" type="button">Back to sign in</button><p id="authMessage" class="small" role="status" aria-live="polite"></p></div>
-<div id="ownerApp" class="hidden"><div class="row" style="margin-bottom:12px"><span id="ownerEmail" class="small"></span><button class="secondary" id="signoutBtn" type="button">Sign out</button></div><nav id="ownerNav"><button class="active" data-tab="home">Home</button><button data-tab="setup">Business setup</button><button data-tab="services">Services</button><button data-tab="replies">Smart replies</button><button data-tab="bookings">Bookings</button><button data-tab="subscription">Subscription</button><button data-tab="admin" id="adminNavBtn" class="hidden">Admin approvals</button></nav>
-<section id="home" class="active"><div class="card"><h2 id="welcome">Welcome to PocketSeller</h2><p class="small">Your business details and records are saved online in Supabase.</p><div id="homeAccessNotice" class="notice"></div><div class="grid"><div class="metric">Services<strong id="mServices">0</strong></div><div class="metric">Bookings<strong id="mBookings">0</strong></div></div><button class="primary full" id="shareBtn" type="button">Get my booking link</button><div id="linkBox" class="hidden"><label>Your public booking link</label><input id="bookingLink" readonly><button class="secondary full" id="copyBtn" type="button">Copy booking link</button><p class="small">Share this link with customers. They can request an appointment while your subscription is active.</p></div></div><div class="card"><h2>Try a smart reply</h2><label>Choose a customer question</label><select id="question"><option>How much do you charge?</option><option>Where are you located?</option><option>What time do you open?</option><option>How do I book?</option><option>Do I need to pay a deposit?</option><option>What services do you offer?</option></select><button class="primary full" id="previewBtn" type="button">Show suggested answer</button><div id="preview" class="reply hidden" style="margin-top:12px"></div></div></section>
-<section id="setup"><div class="card"><h2>Quick business setup</h2><form id="bizForm"><label>Business name</label><input id="bizName" required maxlength="80"><label>Business type</label><select id="bizType"><option>Hairstylist / Wig installer</option><option>Barber</option><option>Nail technician</option><option>Makeup artist</option><option>Fashion designer</option><option>Other service business</option></select><label>Location</label><input id="bizLocation" maxlength="180"><label>Opening hours</label><input id="bizHours" maxlength="120"><label>WhatsApp number</label><input id="bizPhone" inputmode="numeric" maxlength="20" placeholder="2348012345678"><p class="small">Use country code and digits only. For Nigeria, start with 234 and omit the first zero.</p><label>Deposit and booking policy</label><textarea id="bizPolicy" maxlength="500"></textarea><button class="primary full" type="submit">Save business setup</button></form><p id="bizMessage" class="small" role="status"></p></div></section>
-<section id="services"><div class="card"><h2>Add a service</h2><form id="serviceForm"><label>Service name</label><input id="sName" required maxlength="100"><label>Price in naira</label><input id="sPrice" required type="number" min="0" step="1"><label>Extra details (optional)</label><input id="sNote" maxlength="180"><button class="primary full" type="submit">Add service</button></form></div><div class="card"><h2>Your services</h2><div id="serviceList"></div></div></section>
-<section id="replies"><div class="card"><h2>Suggested answers</h2><p class="small">Review these answers before sending them to customers.</p><div id="replyList"></div></div></section>
-<section id="bookings"><div class="card"><h2>Record a booking</h2><form id="bookingForm"><label>Customer name</label><input id="bName" required maxlength="80"><label>Service</label><input id="bService" required maxlength="100"><label>Appointment date</label><input id="bDate" type="date" required><label>Total price (₦)</label><input id="bPrice" type="number" min="0" step="1" required><label>Deposit paid (₦)</label><input id="bPaid" type="number" min="0" step="1" value="0" required><button class="primary full" type="submit">Record booking</button></form><p id="bookingMessage" class="small" role="status"></p></div><div class="card"><h2>Saved bookings</h2><div id="bookingList"></div></div></section>
-<section id="subscription"><div class="card"><h2>Your PocketSeller plan</h2><div id="subscriptionStatus" class="notice">Loading subscription…</div><p class="small">Free trial: 7 days after you save your business setup. Renewal: ₦1,500 for 30 days. When access expires, your records remain saved and can be used again after renewal.</p></div><div class="card"><h2>Renew by UBA transfer</h2><p class="notice"><strong>Bank:</strong> UBA<br><strong>Account name:</strong> Dominion Ayo Moses<br><strong>Account number:</strong> <span id="ubaAccountNumber">2418063150</span> <button class="secondary" id="copyUbaBtn" type="button">Copy account number</button><br><strong>Amount:</strong> ₦1,500<br><br>Transfer ₦1,500 to this account, then enter your bank transfer reference below. Please verify the account name before transferring. Your renewal remains pending until the PocketSeller operator confirms receipt.</p><form id="paymentRequestForm"><label>UBA transfer reference</label><input id="paymentReference" required maxlength="120" placeholder="Enter your UBA transaction reference"><button id="paymentRequestBtn" class="primary full" type="submit">Submit payment for verification</button></form><p id="paymentMessage" class="small" role="status"></p></div><div class="card"><h3>Your payment requests</h3><div id="paymentRequestList"></div></div></section>
-<section id="admin"><div class="card"><h2>Payment approvals</h2><p class="small">Confirm the transfer in your UBA account before approving. Approving activates 30 days of access for the customer.</p><button class="primary full" id="refreshPaymentsBtn" type="button">Refresh payment requests</button><p id="adminMessage" class="small" role="status" aria-live="polite"></p><div id="adminPaymentList"></div></div></section>
-</div></main><footer>PocketSeller · Simple tools for small businesses</footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
-(function(){"use strict";
-var SUPABASE_URL="https://nqfkmjevzuhpckxdhrdh.supabase.co";
-var SUPABASE_KEY="sb_publishable_F_au0_jD6Mll9_It3PHmvg_SGM4KdND";
-var db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-var business=null,services=[],bookings=[],user=null,subscription=null,paymentRequests=[],authMode="signin";
-var params=new URLSearchParams(location.search),publicSlug=params.get("slug")||"",isPublic=params.get("book")==="1";
-function $(id){return document.getElementById(id)}function money(n){return "₦"+Number(n||0).toLocaleString("en-NG")}function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}function message(id,text){var el=$(id);if(el)el.textContent=text}function slugify(s){var base=String(s||"business").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");return (base||"business")+"-"+Math.random().toString(36).slice(2,8)}function phoneNumber(){return String(business&&business.whatsapp_number||"").replace(/\D/g,"")}function waLink(text){var phone=phoneNumber();return phone?"https://wa.me/"+phone+"?text="+encodeURIComponent(text):""}function bookingUrl(){return business&&business.public_slug?location.origin+location.pathname+"?book=1&slug="+encodeURIComponent(business.public_slug):""}function siteRedirect(){return location.origin+location.pathname}
-function isPocketSellerAdmin(){return !!user&&String(user.email||"").toLowerCase()==="domixayo@gmail.com"}
-function hasAccess(){if(!subscription||!["trial","active"].includes(subscription.status)||!subscription.expires_at)return false;return new Date(subscription.expires_at).getTime()>Date.now()}
-function switchTab(name){if(name==="admin"&&!isPocketSellerAdmin()){name="home"}if(["services","replies","bookings"].includes(name)&&!hasAccess()){message("subscriptionStatus","Your trial or subscription has expired. Renew for ₦1,500 to restore access. Your saved records have not been deleted.");name="subscription"}document.querySelectorAll("#ownerApp section").forEach(function(s){s.classList.toggle("active",s.id===name)});document.querySelectorAll("#ownerNav button").forEach(function(b){b.classList.toggle("active",b.dataset.tab===name)})}
-document.querySelectorAll("#ownerNav button").forEach(function(b){b.addEventListener("click",function(){switchTab(b.dataset.tab);if(b.dataset.tab==="admin"&&isPocketSellerAdmin())loadAdminPayments()})});
-function setAuthMode(mode){authMode=mode;var signIn=mode==="signin",signUp=mode==="signup",forgot=mode==="forgot",reset=mode==="reset";$("authCard").classList.remove("hidden");$("authTitle").textContent=signIn?"Business owner sign-in":signUp?"Create your PocketSeller account":forgot?"Reset your password":"Choose a new password";$("authDescription").textContent=signIn?"Sign in to manage your PocketSeller business and bookings.":signUp?"Create an account to set up your business.":forgot?"Enter your email and we will send you a password reset link.":"Enter and confirm your new password.";$("authNameWrap").classList.toggle("hidden",!signUp);$("confirmPasswordWrap").classList.toggle("hidden",!(signUp||reset));$("passwordWrap").classList.toggle("hidden",forgot);$("authName").required=signUp;$("authPassword").required=!forgot;$("authPasswordConfirm").required=signUp||reset;$("authPassword").autocomplete=reset||signUp?"new-password":"current-password";$("authEmail").disabled=reset;$("authEmail").required=!reset;$("authEmailWrap").classList.toggle("hidden",reset);$("authSubmit").textContent=signIn?"Sign in":signUp?"Create account":forgot?"Send reset email":"Save new password";$("signupBtn").classList.toggle("hidden",!signIn);$("forgotBtn").classList.toggle("hidden",!signIn);$("googleBtn").classList.toggle("hidden",!signIn);$("backLoginBtn").classList.toggle("hidden",signIn);message("authMessage","")}
-function showSignedOut(text){user=null;business=null;services=[];bookings=[];subscription=null;paymentRequests=[];$("ownerApp").classList.add("hidden");$("adminNavBtn").classList.add("hidden");if(!isPublic){$("authCard").classList.remove("hidden");setAuthMode("signin");if(text)message("authMessage",text)}}
-function answers(){var b=business||{},prices=services.length?services.map(function(s){return s.name+": "+money(s.price)}).join("\n"):"Please contact us for our current prices.";return [["How much do you charge?","Hello! Thanks for contacting "+(b.business_name||"us")+". Our services and prices are:\n"+prices+"\nWhich service are you interested in?"],["Where are you located?",b.location?"Hello! "+(b.business_name||"We")+" are located at "+b.location+".":"Please message us to confirm our location."],["What time do you open?",b.hours?"Our opening hours are "+b.hours+".":"Please message us to confirm our opening hours."],["How do I book?","Please use our booking link to select a service, date and time. Your request will be sent to us for confirmation."],["Do I need to pay a deposit?",b.policy||"Please contact us to confirm our deposit and booking policy."],["What services do you offer?",prices]]}
-function renderReplies(){var html="";answers().forEach(function(a){html+='<div class="item"><strong>'+esc(a[0])+'</strong><p class="reply">'+esc(a[1])+'</p><button class="secondary" type="button" data-copy-reply="'+encodeURIComponent(a[1])+'">Copy answer</button></div>'});$("replyList").innerHTML=html}
-function renderServices(){$("mServices").textContent=services.length;if(!services.length){$("serviceList").innerHTML='<div class="empty">No services yet. Add your first service above.</div>';return}var html="";services.forEach(function(s){html+='<div class="item"><div class="row"><strong>'+esc(s.name)+'</strong><span class="tag">'+money(s.price)+'</span></div>';if(s.note||s.description)html+='<p class="small">'+esc(s.note||s.description)+'</p>';html+='<button class="danger" type="button" data-delete-service="'+esc(s.id)+'">Delete</button></div>'});$("serviceList").innerHTML=html}
-function renderBookings(){$("mBookings").textContent=bookings.length;if(!bookings.length){$("bookingList").innerHTML='<div class="empty">No bookings recorded yet.</div>';return}var html="";bookings.forEach(function(b){html+='<div class="item"><div class="row"><strong>'+esc(b.customer_name)+'</strong><span class="tag">'+esc(b.status||"pending")+'</span></div><p class="small">'+esc(b.service_name||"Service")+' · '+esc(b.booking_date||"")+' · '+money(b.total_price)+'</p><p class="small">Deposit: '+money(b.deposit_paid)+'</p><div class="row"><button class="secondary" type="button" data-status-booking="'+esc(b.id)+'">Mark confirmed</button><button class="danger" type="button" data-delete-booking="'+esc(b.id)+'">Delete</button></div></div>'});$("bookingList").innerHTML=html}
-function render(){$("welcome").textContent="Welcome"+(business&&business.business_name?" to "+business.business_name:" to PocketSeller");$("bizName").value=business&&business.business_name||"";$("bizType").value=business&&business.business_type||"Hairstylist / Wig installer";$("bizLocation").value=business&&business.location||"";$("bizHours").value=business&&business.hours||"";$("bizPhone").value=business&&business.whatsapp_number||"";$("bizPolicy").value=business&&business.policy||"";renderServices();renderBookings();renderReplies();renderSubscription()}
-function renderSubscription(){var box=$("subscriptionStatus");if(!subscription){box.className="notice locked";box.textContent=business?"No subscription record was found. Save your business setup again, then reload this page. If this persists, check the trial setup SQL.":"Save your business setup to start your 7-day free trial."}else{var expiry=new Date(subscription.expires_at),expiryText=subscription.expires_at?expiry.toLocaleString():"not set";if(hasAccess()){var days=Math.max(0,Math.ceil((expiry.getTime()-Date.now())/86400000));box.className="notice good";box.textContent=(subscription.status==="trial"?"FREE TRIAL":"SUBSCRIPTION ACTIVE")+" · "+days+" day(s) remaining · access ends "+expiryText}else{box.className="notice locked";box.textContent="ACCESS EXPIRED · "+expiryText+". Renew for ₦1,500 to restore access. Your records remain saved."}}
-var pending=paymentRequests.some(function(p){return (p.review_status||p.status)==="pending"});$("paymentRequestBtn").disabled=pending;$("paymentReference").disabled=pending;if(pending)message("paymentMessage","You already have a payment request pending verification.");if(!paymentRequests.length){$("paymentRequestList").innerHTML='<div class="empty">No payment requests yet.</div>';applyAccess();return}var html="";paymentRequests.forEach(function(p){var status=p.review_status||p.status||"pending";html+='<div class="item"><div class="row"><strong>'+esc(p.payment_reference)+'</strong><span class="tag">'+esc(status)+'</span></div><p class="small">'+new Date(p.created_at).toLocaleString()+" · "+money(p.amount)+'</p></div>'});$("paymentRequestList").innerHTML=html;applyAccess()}
-function applyAccess(){var active=hasAccess();document.querySelectorAll('#ownerNav button[data-tab="services"],#ownerNav button[data-tab="replies"],#ownerNav button[data-tab="bookings"]').forEach(function(b){b.disabled=!active});$("shareBtn").disabled=!active;$("serviceForm").querySelector('button[type="submit"]').disabled=!active;$("bookingForm").querySelector('button[type="submit"]').disabled=!active;$("homeAccessNotice").className="notice "+(active?"good":"locked");$("homeAccessNotice").textContent=active?(subscription.status==="trial"?"Your 7-day free trial is active.":"Your PocketSeller subscription is active."):"Services, smart replies, bookings, and your public booking link require an active trial or subscription. Open Subscription to renew."}
-async function loadSubscription(){if(!user){subscription=null;paymentRequests=[];return}var r=await db.from("subscriptions").select("user_id,status,amount,started_at,expires_at,payment_method,payment_reference").eq("user_id",user.id).maybeSingle();if(r.error){subscription=null;message("paymentMessage","Could not load subscription: "+r.error.message)}else subscription=r.data||null;var q=await db.from("subscription_payment_requests").select("id,user_id,amount,payment_method,payment_reference,status,review_status,created_at,reviewed_at").eq("user_id",user.id).order("created_at",{ascending:false}).limit(10);paymentRequests=q.error?[]:(q.data||[]);renderSubscription()}
-async function loadOwner(){if(!user||isPublic)return;$("authCard").classList.add("hidden");$("ownerApp").classList.remove("hidden");$("ownerEmail").textContent=user.email||"Signed in";$("adminNavBtn").classList.toggle("hidden",!isPocketSellerAdmin());message("bizMessage","");var result=await db.from("businesses").select("*").eq("owner_id",user.id).limit(1);if(result.error){message("bizMessage","Could not load your business: "+result.error.message);return}business=result.data&&result.data.length?result.data[0]:null;if(business&&!business.public_slug){var u=await db.from("businesses").update({public_slug:slugify(business.business_name)}).eq("id",business.id).eq("owner_id",user.id).select("*").single();if(!u.error)business=u.data}await loadSubscription();if(business){await loadServices();await loadBookings();render();applyAccess()}else{services=[];bookings=[];render();switchTab("setup");message("bizMessage","Save your business details to start your 7-day trial.")}}
-async function loadServices(){if(!business){services=[];return}var r=await db.from("services").select("*").eq("business_id",business.id).order("created_at",{ascending:false});if(r.error){services=[];if(hasAccess())message("bizMessage","Could not load services: "+r.error.message);return}services=r.data||[]}
-async function loadBookings(){if(!business){bookings=[];return}var r=await db.from("bookings").select("*").eq("business_id",business.id).order("created_at",{ascending:false});if(r.error){bookings=[];if(hasAccess())message("bookingMessage","Could not load bookings: "+r.error.message);return}bookings=r.data||[]}
-async function loadAdminPayments(){if(!isPocketSellerAdmin()){message("adminMessage","Not authorized.");return}message("adminMessage","Loading payment requests...");$("adminPaymentList").innerHTML="";var r=await db.rpc("pocketseller_admin_list_payments");if(r.error){message("adminMessage","Could not load requests: "+r.error.message);return}var rows=r.data||[];if(!rows.length){$("adminPaymentList").innerHTML='<p class="empty">No payment requests yet.</p>';message("adminMessage","");return}var html="";rows.forEach(function(p){var review=p.review_status||p.status||"pending";html+='<div class="item"><strong>'+esc(p.payment_reference||"No reference")+'</strong><p class="small">User ID: '+esc(p.user_id)+'</p><p class="small">Amount: '+money(p.amount)+'</p><p class="small">Method: '+esc(p.payment_method)+'</p><p class="small">Submitted: '+esc(p.created_at?new Date(p.created_at).toLocaleString():"")+'</p><p class="small">Review status: '+esc(review)+'</p>';if(review==="pending"){html+='<button class="primary full" type="button" data-approve-payment="'+esc(p.id)+'">Approve verified payment</button>'}html+='</div>'});$("adminPaymentList").innerHTML=html;message("adminMessage","Payment requests loaded.")}
-$("refreshPaymentsBtn").addEventListener("click",loadAdminPayments);
-document.addEventListener("click",async function(e){var btn=e.target.closest("[data-approve-payment]");if(!btn)return;if(!isPocketSellerAdmin()){alert("Not authorized.");return}var id=btn.getAttribute("data-approve-payment");if(!confirm("Have you confirmed that this ₦1,500 transfer arrived in your UBA account? Only approve if the money is received."))return;btn.disabled=true;message("adminMessage","Approving payment...");var r=await db.rpc("pocketseller_admin_approve_payment",{p_request_id:id});if(r.error){message("adminMessage","Approval failed: "+r.error.message);btn.disabled=false;return}message("adminMessage","Payment approved. Subscription activated.");await loadAdminPayments()});
-$("authForm").addEventListener("submit",async function(e){e.preventDefault();var email=$("authEmail").value.trim(),password=$("authPassword").value;if(authMode==="signin"){message("authMessage","Signing in...");$("authSubmit").disabled=true;try{var r=await db.auth.signInWithPassword({email:email,password:password});if(r.error){message("authMessage",r.error.message);return}user=r.data.user;await loadOwner()}catch(err){message("authMessage","Sign-in failed: "+(err.message||String(err)))}finally{$("authSubmit").disabled=false}return}
-if(authMode==="signup"){var name=$("authName").value.trim(),confirmPassword=$("authPasswordConfirm").value;if(!name){message("authMessage","Enter your name.");return}if(password.length<6||password!==confirmPassword){message("authMessage",password.length<6?"Use a password with at least 6 characters.":"The passwords do not match.");return}message("authMessage","Creating your account...");$("authSubmit").disabled=true;try{var s=await db.auth.signUp({email:email,password:password,options:{data:{full_name:name},emailRedirectTo:siteRedirect()}});if(s.error){message("authMessage",s.error.message);return}if(s.data.session&&s.data.user){user=s.data.user;await loadOwner()}else{setAuthMode("signin");message("authMessage","Account created. Check your email for a confirmation link, then sign in.")}}catch(er){message("authMessage","Account creation failed: "+(er.message||String(er)))}finally{$("authSubmit").disabled=false}return}
-if(authMode==="forgot"){message("authMessage","Sending password reset email...");$("authSubmit").disabled=true;try{var f=await db.auth.resetPasswordForEmail(email,{redirectTo:siteRedirect()});if(f.error){message("authMessage",f.error.message);return}message("authMessage","If an account uses that email, a reset link has been sent. Check inbox and spam.")}catch(er2){message("authMessage",er2.message||String(er2))}finally{$("authSubmit").disabled=false}return}
-if(authMode==="reset"){var cn=$("authPasswordConfirm").value;if(password.length<6||password!==cn){message("authMessage",password.length<6?"Use a password with at least 6 characters.":"The passwords do not match.");return}$("authSubmit").disabled=true;try{var up=await db.auth.updateUser({password:password});if(up.error){message("authMessage",up.error.message);return}setAuthMode("signin");message("authMessage","Password updated. Sign in with your new password.")}catch(er3){message("authMessage",er3.message||String(er3))}finally{$("authSubmit").disabled=false}}});
-$("signupBtn").addEventListener("click",function(){setAuthMode("signup")});$("forgotBtn").addEventListener("click",function(){setAuthMode("forgot")});$("backLoginBtn").addEventListener("click",function(){setAuthMode("signin")});$("googleBtn").addEventListener("click",async function(){message("authMessage","Google sign-in may not be enabled in Supabase yet. Use email and password if it fails.");try{var r=await db.auth.signInWithOAuth({provider:"google",options:{redirectTo:siteRedirect()}});if(r.error)message("authMessage","Google sign-in is not configured. Use email and password. "+r.error.message)}catch(e){message("authMessage","Google sign-in is not configured. Use email and password.")}});$("signoutBtn").addEventListener("click",async function(){await db.auth.signOut();showSignedOut("You have signed out.")});
-$("bizForm").addEventListener("submit",async function(e){e.preventDefault();if(!user){message("bizMessage","Please sign in first.");return}var fields={business_name:$("bizName").value.trim(),business_type:$("bizType").value,location:$("bizLocation").value.trim(),hours:$("bizHours").value.trim(),whatsapp_number:$("bizPhone").value.replace(/\D/g,""),policy:$("bizPolicy").value.trim()};if(!fields.business_name){message("bizMessage","Enter your business name.");return}if(!business)fields.public_slug=slugify(fields.business_name);message("bizMessage","Saving business details...");var r;try{if(business)r=await db.from("businesses").update(fields).eq("id",business.id).eq("owner_id",user.id).select("*").single();else{fields.owner_id=user.id;r=await db.from("businesses").insert(fields).select("*").single()}}catch(er){message("bizMessage","Save failed: "+(er.message||String(er)));return}if(r.error){message("bizMessage","Save failed: "+r.error.message);return}business=r.data;await loadSubscription();render();applyAccess();message("bizMessage","Business details saved. Your trial starts when the database records your setup.")});
-$("serviceForm").addEventListener("submit",async function(e){e.preventDefault();if(!hasAccess()){switchTab("subscription");return}if(!business){alert("Save your business setup first.");return}var price=Number($("sPrice").value);if(!Number.isFinite(price)||price<0){alert("Enter a valid price.");return}var v={business_id:business.id,name:$("sName").value.trim(),description:$("sNote").value.trim(),note:$("sNote").value.trim(),price:price,duration_minutes:30,active:true};var r=await db.from("services").insert(v);if(r.error){alert("Could not save service: "+r.error.message);return}$("serviceForm").reset();await loadServices();render()});
-$("bookingForm").addEventListener("submit",async function(e){e.preventDefault();if(!hasAccess()){switchTab("subscription");return}if(!business){alert("Save your business setup first.");return}var price=Number($("bPrice").value),paid=Number($("bPaid").value);if(price<0||paid<0||paid>price){alert(paid>price?"Deposit cannot exceed total price.":"Amounts cannot be negative.");return}var r=await db.from("bookings").insert({business_id:business.id,customer_name:$("bName").value.trim(),service_name:$("bService").value.trim(),booking_date:$("bDate").value,booking_time:"12:00",total_price:price,deposit_paid:paid,status:"pending"});if(r.error){message("bookingMessage","Could not record booking: "+r.error.message);return}$("bookingForm").reset();$("bPaid").value="0";await loadBookings();render();message("bookingMessage","Booking recorded successfully.")});
-$("shareBtn").addEventListener("click",function(){if(!hasAccess()){switchTab("subscription");return}var url=bookingUrl();if(!url){alert("Save your business setup first.");return}$("bookingLink").value=url;$("linkBox").classList.remove("hidden")});$("copyBtn").addEventListener("click",async function(){var inp=$("bookingLink");inp.select();try{await navigator.clipboard.writeText(inp.value);alert("Booking link copied.")}catch(e){window.prompt("Select and copy your booking link:",inp.value)}});$("copyUbaBtn").addEventListener("click",async function(){try{await navigator.clipboard.writeText("2418063150");message("paymentMessage","UBA account number copied.")}catch(e){window.prompt("Copy this UBA account number:","2418063150")}});$("previewBtn").addEventListener("click",function(){if(!hasAccess()){switchTab("subscription");return}var f=answers().find(function(a){return a[0]===$("question").value});$("preview").textContent=f?f[1]:"";$("preview").classList.remove("hidden")});
-$("paymentRequestForm").addEventListener("submit",async function(e){e.preventDefault();if(!user)return;var ref=$("paymentReference").value.trim();if(ref.length<3){message("paymentMessage","Enter the transaction reference from your UBA transfer receipt.");return}if(paymentRequests.some(function(p){return (p.review_status||p.status)==="pending"})){message("paymentMessage","You already have a request waiting for verification.");return}$("paymentRequestBtn").disabled=true;message("paymentMessage","Submitting payment reference...");var r=await db.from("subscription_payment_requests").insert({user_id:user.id,amount:1500,payment_method:"UBA",payment_reference:ref,status:"pending"});if(r.error){message("paymentMessage","Could not submit request: "+r.error.message);$("paymentRequestBtn").disabled=false;return}$("paymentReference").value="";await loadSubscription();message("paymentMessage","Payment reference submitted. Access activates only after the PocketSeller operator verifies the transfer.")});
-document.addEventListener("click",async function(e){var c=e.target.closest("[data-copy-reply]");if(c){var v=decodeURIComponent(c.getAttribute("data-copy-reply"));try{await navigator.clipboard.writeText(v);alert("Answer copied.")}catch(er){window.prompt("Copy this answer:",v)}return}var ds=e.target.closest("[data-delete-service]");if(ds){if(!hasAccess()){switchTab("subscription");return}if(!confirm("Delete this service?"))return;var x=await db.from("services").delete().eq("id",ds.getAttribute("data-delete-service")).eq("business_id",business.id);if(x.error){alert("Delete failed: "+x.error.message);return}await loadServices();render();return}var cb=e.target.closest("[data-status-booking]");if(cb){if(!hasAccess()){switchTab("subscription");return}var y=await db.from("bookings").update({status:"confirmed"}).eq("id",cb.getAttribute("data-status-booking")).eq("business_id",business.id);if(y.error){alert("Could not update booking: "+y.error.message);return}await loadBookings();render();return}var dbk=e.target.closest("[data-delete-booking]");if(dbk){if(!hasAccess()){switchTab("subscription");return}if(!confirm("Delete this booking record?"))return;var z=await db.from("bookings").delete().eq("id",dbk.getAttribute("data-delete-booking")).eq("business_id",business.id);if(z.error){alert("Delete failed: "+z.error.message);return}await loadBookings();render()}});
-async function loadPublic(){$("authCard").classList.add("hidden");$("ownerApp").classList.add("hidden");$("publicPage").classList.remove("hidden");var t=new Date(),min=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");$("pDate").min=min;if(!publicSlug){$("publicTitle").textContent="Booking link missing";$("publicInfo").textContent="Please use the complete booking link from the business.";$("publicForm").classList.add("hidden");return}var br=await db.rpc("ps_get_public_business_for_booking",{p_slug:publicSlug});if(br.error||!br.data){$("publicTitle").textContent="Booking is unavailable";$("publicInfo").textContent="This business may have an expired trial/subscription or an invalid booking link. Please contact the business directly.";$("publicForm").classList.add("hidden");return}var b=Array.isArray(br.data)?br.data[0]:br.data;if(!b){$("publicTitle").textContent="Booking is unavailable";$("publicInfo").textContent="Please contact the business directly.";$("publicForm").classList.add("hidden");return}business=b;$("publicTitle").textContent="Book with "+b.business_name;$("publicInfo").textContent=[b.location,b.hours].filter(Boolean).join(" · ");var sr=await db.rpc("ps_get_public_services_for_booking",{p_slug:publicSlug});services=sr.data||[];if(!Array.isArray(services))services=[];var opts='<option value="">Choose a service</option>',cards="";services.forEach(function(s){opts+='<option value="'+esc(s.id)+'">'+esc(s.name)+" — "+money(s.price)+"</option>";cards+='<div class="item"><strong>'+esc(s.name)+'</strong><p>'+money(s.price)+'</p>';if(s.description||s.note)cards+='<p class="small">'+esc(s.note||s.description)+'</p>';cards+='</div>'});$("pService").innerHTML=opts;$("publicServices").innerHTML=cards||'<p class="empty">No services are currently available.</p>';if(!services.length)$("publicForm").classList.add("hidden")}
-$("publicForm").addEventListener("submit",async function(e){e.preventDefault();if(!business||!services.length)return;var s=services.find(function(v){return String(v.id)===String($("pService").value)});if(!s){alert("Please choose a service.");return}var date=$("pDate").value;if(!date||date<$("pDate").min){alert("Please choose today or a future date.");return}var contact=$("pContact").value.trim(),notes=$("pNotes").value.trim(),btn=$("publicForm").querySelector('button[type="submit"]');btn.disabled=true;btn.textContent="Sending request...";try{var r=await db.rpc("ps_submit_public_booking",{p_slug:publicSlug,p_service_id:s.id,p_customer_name:$("pName").value.trim(),p_customer_phone:contact,p_booking_date:date,p_booking_time:$("pTime").value,p_notes:notes});if(r.error){$("publicMessage").textContent="Booking could not be saved: "+r.error.message;$("publicMessage").classList.remove("hidden");return}var time=$("pTime").selectedOptions[0]?$("pTime").selectedOptions[0].text:$("pTime").value;var txt="Hello, I submitted a booking request.\nName: "+$("pName").value.trim()+"\nService: "+s.name+"\nPrice: "+money(s.price)+"\nDate: "+date+"\nTime: "+time+"\nContact: "+contact+(notes?"\nNotes: "+notes:"")+"\nPlease confirm availability.";var link=waLink(txt);$("publicMessage").textContent="Your request has been recorded. "+(link?"Opening WhatsApp so you can contact the business.":"Please contact the business to confirm.");$("publicMessage").classList.remove("hidden");if(link)location.href=link}catch(er){$("publicMessage").textContent="Booking failed: "+(er.message||String(er));$("publicMessage").classList.remove("hidden")}finally{btn.disabled=false;btn.textContent="Send booking request"}});
-async function start(){if(isPublic){await loadPublic();return}db.auth.onAuthStateChange(function(ev,session){window.setTimeout(function(){if(ev==="PASSWORD_RECOVERY"){$("ownerApp").classList.add("hidden");setAuthMode("reset");message("authMessage","Choose a new password for your account.");return}if(ev==="SIGNED_OUT"){showSignedOut("");return}if(ev==="SIGNED_IN"&&session&&session.user&&!user){user=session.user;loadOwner()}},0)});var r=await db.auth.getSession();if(r.error){message("authMessage","Could not check your session: "+r.error.message);return}if(r.data&&r.data.session){user=r.data.session.user;await loadOwner()}else setAuthMode("signin")}
-setAuthMode("signin");start().catch(function(er){if(!isPublic)message("authMessage","PocketSeller could not start: "+(er.message||String(er)));else message("publicInfo","Could not load the booking page. Please try again.")});
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6f4;color:#17251f;font:16px Arial,sans-serif}
+header{background:#10251d;color:white;padding:20px 16px}
+header h1{margin:0;font-size:26px}
+header p{color:#c9ded2;margin:7px 0 0}
+main{max-width:760px;margin:auto;padding:14px}
+nav{display:flex;gap:7px;overflow:auto;margin-bottom:12px}
+button,.btn{border:0;border-radius:9px;padding:12px;cursor:pointer;font-weight:bold}
+button:disabled{opacity:.5;cursor:not-allowed}
+nav button{white-space:nowrap;background:#dfe7e1}
+nav button.active,.primary{background:#205b43;color:white}
+.secondary{background:#e4eee7;color:#183d2c}
+.danger{background:#f8e4e4;color:#8b2020}
+section{display:none}
+section.active{display:block}
+.card{background:white;border:1px solid #dce5df;border-radius:13px;padding:16px;margin-bottom:12px}
+h2{font-size:20px;margin:0 0 12px}
+h3{font-size:16px}
+label{display:block;font-size:13px;font-weight:bold;margin:12px 0 5px}
+input,textarea,select{width:100%;padding:12px;border:1px solid #cbd7ce;border-radius:8px;font:inherit;background:white}
+textarea{min-height:70px}
+form button{margin-top:14px}
+button.full{width:100%;margin-top:12px}
+.small{font-size:13px;color:#637269;line-height:1.5}
+.metric{background:#edf4ef;padding:13px;border-radius:10px}
+.metric strong{display:block;font-size:23px;margin-top:5px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.item{border-top:1px solid #e4eae5;padding:12px 0;overflow-wrap:anywhere}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.reply{white-space:pre-wrap;background:#f0f5f1;padding:12px;border-left:3px solid #205b43;border-radius:6px;line-height:1.5;overflow-wrap:anywhere}
+.tag{font-size:12px;background:#e3eee6;border-radius:20px;padding:5px 8px}
+.empty{padding:12px 0;color:#738077}
+a{color:#205b43;overflow-wrap:anywhere}
+footer{text-align:center;padding:22px;color:#637269;font-size:12px}
+.hidden{display:none!important}
+.notice{padding:11px;background:#edf4ef;border-radius:8px;margin:10px 0;line-height:1.5;overflow-wrap:anywhere}
+.locked{background:#fff4df;color:#6c4a0a}
+.good{background:#e4f5e8;color:#16552a}
+</style>
+</head>
+<body>
+<header>
+<h1>PocketSeller</h1>
+<p>Less typing. Faster replies. Easier bookings.</p>
+</header>
+<main>
+
+<div id="publicPage" class="hidden">
+  <div class="card">
+    <h2 id="publicTitle">Book an appointment</h2>
+    <p id="publicInfo" class="small"></p>
+    <form id="publicForm">
+      <label>Your name</label>
+      <input id="pName" required maxlength="80" autocomplete="name">
+      <label>Choose a service</label>
+      <select id="pService" required></select>
+      <label>Preferred date</label>
+      <input id="pDate" type="date" required>
+      <label>Preferred time</label>
+      <select id="pTime" required>
+        <option value="">Choose a time</option>
+        <option value="09:00">9:00 AM</option>
+        <option value="10:00">10:00 AM</option>
+        <option value="11:00">11:00 AM</option>
+        <option value="12:00">12:00 PM</option>
+        <option value="13:00">1:00 PM</option>
+        <option value="14:00">2:00 PM</option>
+        <option value="15:00">3:00 PM</option>
+        <option value="16:00">4:00 PM</option>
+        <option value="17:00">5:00 PM</option>
+      </select>
+      <label>Contact number or social handle</label>
+      <input id="pContact" required maxlength="100">
+      <label>Additional notes (optional)</label>
+      <textarea id="pNotes" maxlength="500"></textarea>
+      <button class="primary full" type="submit">Send booking request</button>
+    </form>
+    <p class="small">Your appointment is not confirmed until the business confirms it.</p>
+    <div id="publicMessage" class="notice hidden" role="status"></div>
+  </div>
+  <div class="card">
+    <h3>Services and prices</h3>
+    <div id="publicServices"></div>
+  </div>
+</div>
+
+<div id="authCard" class="card">
+  <h2 id="authTitle">Business owner sign-in</h2>
+  <p id="authDescription" class="small">Sign in to manage your PocketSeller business and bookings.</p>
+  <form id="authForm">
+    <div id="authNameWrap" class="hidden">
+      <label>Your name</label>
+      <input id="authName" maxlength="80" autocomplete="name">
+    </div>
+    <div id="authEmailWrap">
+      <label>Email address</label>
+      <input id="authEmail" type="email" autocomplete="email" required>
+    </div>
+    <div id="passwordWrap">
+      <label id="passwordLabel">Password</label>
+      <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required>
+    </div>
+    <div id="confirmPasswordWrap" class="hidden">
+      <label>Confirm password</label>
+      <input id="authPasswordConfirm" type="password" minlength="6" autocomplete="new-password">
+    </div>
+    <button class="primary full" id="authSubmit" type="submit">Sign in</button>
+  </form>
+  <button class="secondary full" id="signupBtn" type="button">Create an account</button>
+  <button class="secondary full" id="forgotBtn" type="button">Forgot password?</button>
+  <button class="secondary full" id="googleBtn" type="button">Continue with Google</button>
+  <button class="secondary full hidden" id="backLoginBtn" type="button">Back to sign in</button>
+  <p id="authMessage" class="small" role="status" aria-live="polite"></p>
+</div>
+
+<div id="ownerApp" class="hidden">
+  <div class="row" style="margin-bottom:12px">
+    <span id="ownerEmail" class="small"></span>
+    <button class="secondary" id="signoutBtn" type="button">Sign out</button>
+  </div>
+
+  <nav id="ownerNav">
+    <button class="active" data-tab="home">Home</button>
+    <button data-tab="setup">Business setup</button>
+    <button data-tab="services">Services</button>
+    <button data-tab="replies">Smart replies</button>
+    <button data-tab="bookings">Bookings</button>
+    <button data-tab="subscription">Subscription</button>
+    <button data-tab="admin" id="adminNavBtn" class="hidden">Admin approvals</button>
+  </nav>
+
+  <section id="home" class="active">
+    <div class="card">
+      <h2 id="welcome">Welcome to PocketSeller</h2>
+      <p class="small">Your business details and records are saved online in Supabase.</p>
+      <div id="homeAccessNotice" class="notice"></div>
+      <div class="grid">
+        <div class="metric">Services<strong id="mServices">0</strong></div>
+        <div class="metric">Bookings<strong id="mBookings">0</strong></div>
+      </div>
+      <button class="primary full" id="shareBtn" type="button">Get my booking link</button>
+      <div id="linkBox" class="hidden">
+        <label>Your public booking link</label>
+        <input id="bookingLink" readonly>
+        <button class="secondary full" id="copyBtn" type="button">Copy booking link</button>
+        <p class="small">Share this link with customers. They can request an appointment while your subscription is active.</p>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Try a smart reply</h2>
+      <label>Choose a customer question</label>
+      <select id="question">
+        <option>How much do you charge?</option>
+        <option>Where are you located?</option>
+        <option>What time do you open?</option>
+        <option>How do I book?</option>
+        <option>Do I need to pay a deposit?</option>
+        <option>What services do you offer?</option>
+      </select>
+      <button class="primary full" id="previewBtn" type="button">Show suggested answer</button>
+      <div id="preview" class="reply hidden" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <section id="setup">
+    <div class="card">
+      <h2>Quick business setup</h2>
+      <form id="bizForm">
+        <label>Business name</label>
+        <input id="bizName" required maxlength="80">
+        <label>Business type</label>
+        <select id="bizType">
+          <option>Hairstylist / Wig installer</option>
+          <option>Barber</option>
+          <option>Nail technician</option>
+          <option>Makeup artist</option>
+          <option>Fashion designer</option>
+          <option>Other service business</option>
+        </select>
+        <label>Location</label>
+        <input id="bizLocation" maxlength="180">
+        <label>Opening hours</label>
+        <input id="bizHours" maxlength="120">
+        <label>WhatsApp number</label>
+        <input id="bizPhone" inputmode="numeric" maxlength="20" placeholder="2348012345678">
+        <p class="small">Use country code and digits only. For Nigeria, start with 234 and omit the first zero.</p>
+        <label>Deposit and booking policy</label>
+        <textarea id="bizPolicy" maxlength="500"></textarea>
+        <button class="primary full" type="submit">Save business setup</button>
+      </form>
+      <p id="bizMessage" class="small" role="status"></p>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="card">
+      <h2>Add a service</h2>
+      <form id="serviceForm">
+        <label>Service name</label>
+        <input id="sName" required maxlength="100">
+        <label>Price in naira (optional)</label>
+        <input id="sPrice" type="number" min="0" step="1" placeholder="Leave blank if price varies">
+        <p class="small">You can add a price now or leave it blank and update it later.</p>
+        <label>Extra details (optional)</label>
+        <input id="sNote" maxlength="180">
+        <button class="primary full" type="submit">Add service</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Your services</h2>
+      <div id="serviceList"></div>
+    </div>
+  </section>
+
+  <section id="replies">
+    <div class="card">
+      <h2>Suggested answers</h2>
+      <p class="small">Review these answers before sending them to customers.</p>
+      <div id="replyList"></div>
+    </div>
+  </section>
+
+  <section id="bookings">
+    <div class="card">
+      <h2>Record a booking</h2>
+      <form id="bookingForm">
+        <label>Customer name</label>
+        <input id="bName" required maxlength="80">
+        <label>Service</label>
+        <input id="bService" required maxlength="100">
+        <label>Appointment date</label>
+        <input id="bDate" type="date" required>
+        <label>Total price (₦)</label>
+        <input id="bPrice" type="number" min="0" step="1" required>
+        <label>Deposit paid (₦)</label>
+        <input id="bPaid" type="number" min="0" step="1" value="0" required>
+        <button class="primary full" type="submit">Record booking</button>
+      </form>
+      <p id="bookingMessage" class="small" role="status"></p>
+    </div>
+    <div class="card">
+      <h2>Saved bookings</h2>
+      <div id="bookingList"></div>
+    </div>
+  </section>
+
+  <section id="subscription">
+    <div class="card">
+      <h2>Your PocketSeller plan</h2>
+      <div id="subscriptionStatus" class="notice">Loading subscription…</div>
+      <p class="small">Free trial: 7 days after you save your business setup. Renewal: ₦1,500 for 30 days. When access expires, your records remain saved and can be used again after renewal.</p>
+    </div>
+    <div class="card">
+      <h2>Renew by UBA transfer</h2>
+      <p class="notice">
+        <strong>Bank:</strong> UBA<br>
+        <strong>Account name:</strong> Dominion Ayo Moses<br>
+        <strong>Account number:</strong> <span id="ubaAccountNumber">2418063150</span>
+        <button class="secondary" id="copyUbaBtn" type="button">Copy account number</button><br>
+        <strong>Amount:</strong> ₦1,500<br><br>
+        Transfer ₦1,500 to this account, then enter your bank transfer reference below. Please verify the account name before transferring. Your renewal remains pending until the PocketSeller operator confirms receipt.
+      </p>
+      <form id="paymentRequestForm">
+        <label>UBA transfer reference</label>
+        <input id="paymentReference" required maxlength="120" placeholder="Enter your UBA transaction reference">
+        <button id="paymentRequestBtn" class="primary full" type="submit">Submit payment for verification</button>
+      </form>
+      <p id="paymentMessage" class="small" role="status"></p>
+    </div>
+    <div class="card">
+      <h3>Your payment requests</h3>
+      <div id="paymentRequestList"></div>
+    </div>
+  </section>
+
+  <section id="admin">
+    <div class="card">
+      <h2>Payment approvals</h2>
+      <p class="small">Confirm the transfer in your UBA account before approving. Approving activates 30 days of access for the customer.</p>
+      <button class="primary full" id="refreshPaymentsBtn" type="button">Refresh payment requests</button>
+      <p id="adminMessage" class="small" role="status" aria-live="polite"></p>
+      <div id="adminPaymentList"></div>
+    </div>
+  </section>
+</div>
+</main>
+<footer>PocketSeller · Simple tools for small businesses</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function() {
+"use strict";
+
+var SUPABASE_URL = "https://nqfkmjevzuhpckxdhrdh.supabase.co";
+var SUPABASE_KEY = "sb_publishable_F_au0_jD6Mll9_It3PHmvg_SGM4KdND";
+var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+var business = null;
+var services = [];
+var bookings = [];
+var user = null;
+var subscription = null;
+var paymentRequests = [];
+var authMode = "signin";
+
+var params = new URLSearchParams(location.search);
+var publicSlug = params.get("slug") || "";
+var isPublic = params.get("book") === "1";
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+function money(n) {
+  return "₦" + Number(n || 0).toLocaleString("en-NG");
+}
+
+function priceLabel(n) {
+  if (n === null || n === undefined || n === "") {
+    return "Price not set";
+  }
+  return money(n);
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function message(id, text) {
+  var el = $(id);
+  if (el) el.textContent = text;
+}
+
+function slugify(s) {
+  var base = String(s || "business")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return (base || "business") + "-" + Math.random().toString(36).slice(2, 8);
+}
+
+function phoneNumber() {
+  return String(business && business.whatsapp_number || "").replace(/\D/g, "");
+}
+
+function waLink(text) {
+  var phone = phoneNumber();
+  return phone ? "https://wa.me/" + phone + "?text=" + encodeURIComponent(text) : "";
+}
+
+function bookingUrl() {
+  return business && business.public_slug
+    ? location.origin + location.pathname + "?book=1&slug=" + encodeURIComponent(business.public_slug)
+    : "";
+}
+
+function siteRedirect() {
+  return location.origin + location.pathname;
+}
+
+function isPocketSellerAdmin() {
+  return !!user && String(user.email || "").toLowerCase() === "domixayo@gmail.com";
+}
+
+function hasAccess() {
+  if (!subscription || !["trial", "active"].includes(subscription.status) || !subscription.expires_at) {
+    return false;
+  }
+  return new Date(subscription.expires_at).getTime() > Date.now();
+}
+
+function switchTab(name) {
+  if (name === "admin" && !isPocketSellerAdmin()) name = "home";
+
+  if (["services", "replies", "bookings"].includes(name) && !hasAccess()) {
+    message("subscriptionStatus", "Your trial or subscription has expired. Renew for ₦1,500 to restore access. Your saved records have not been deleted.");
+    name = "subscription";
+  }
+
+  document.querySelectorAll("#ownerApp section").forEach(function(s) {
+    s.classList.toggle("active", s.id === name);
+  });
+
+  document.querySelectorAll("#ownerNav button").forEach(function(b) {
+    b.classList.toggle("active", b.dataset.tab === name);
+  });
+}
+
+document.querySelectorAll("#ownerNav button").forEach(function(b) {
+  b.addEventListener("click", function() {
+    switchTab(b.dataset.tab);
+    if (b.dataset.tab === "admin" && isPocketSellerAdmin()) {
+      loadAdminPayments();
+    }
+  });
+});
+
+function setAuthMode(mode) {
+  authMode = mode;
+
+  var signIn = mode === "signin";
+  var signUp = mode === "signup";
+  var forgot = mode === "forgot";
+  var reset = mode === "reset";
+
+  $("authCard").classList.remove("hidden");
+  $("authTitle").textContent = signIn ? "Business owner sign-in" :
+    signUp ? "Create your PocketSeller account" :
+    forgot ? "Reset your password" : "Choose a new password";
+
+  $("authDescription").textContent = signIn ?
+    "Sign in to manage your PocketSeller business and bookings." :
+    signUp ? "Create an account to set up your business." :
+    forgot ? "Enter your email and we will send you a password reset link." :
+    "Enter and confirm your new password.";
+
+  $("authNameWrap").classList.toggle("hidden", !signUp);
+  $("confirmPasswordWrap").classList.toggle("hidden", !(signUp || reset));
+  $("passwordWrap").classList.toggle("hidden", forgot);
+  $("authName").required = signUp;
+  $("authPassword").required = !forgot;
+  $("authPasswordConfirm").required = signUp || reset;
+  $("authPassword").autocomplete = reset || signUp ? "new-password" : "current-password";
+  $("authEmail").disabled = reset;
+  $("authEmail").required = !reset;
+  $("authEmailWrap").classList.toggle("hidden", reset);
+
+  $("authSubmit").textContent = signIn ? "Sign in" :
+    signUp ? "Create account" :
+    forgot ? "Send reset email" : "Save new password";
+
+  $("signupBtn").classList.toggle("hidden", !signIn);
+  $("forgotBtn").classList.toggle("hidden", !signIn);
+  $("googleBtn").classList.toggle("hidden", !signIn);
+  $("backLoginBtn").classList.toggle("hidden", signIn);
+
+  message("authMessage", "");
+}
+
+function showSignedOut(text) {
+  user = null;
+  business = null;
+  services = [];
+  bookings = [];
+  subscription = null;
+  paymentRequests = [];
+
+  $("ownerApp").classList.add("hidden");
+  $("adminNavBtn").classList.add("hidden");
+
+  if (!isPublic) {
+    $("authCard").classList.remove("hidden");
+    setAuthMode("signin");
+    if (text) message("authMessage", text);
+  }
+}
+
+function answers() {
+  var b = business || {};
+
+  var prices = services.length
+    ? services.map(function(s) {
+        return s.name + ": " + priceLabel(s.price);
+      }).join("\n")
+    : "Please contact us for our current prices.";
+
+  return [
+    ["How much do you charge?", "Hello! Thanks for contacting " + (b.business_name || "us") + ". Our services and prices are:\n" + prices + "\nWhich service are you interested in?"],
+    ["Where are you located?", b.location ? "Hello! " + (b.business_name || "We") + " are located at " + b.location + "." : "Please message us to confirm our location."],
+    ["What time do you open?", b.hours ? "Our opening hours are " + b.hours + "." : "Please message us to confirm our opening hours."],
+    ["How do I book?", "Please use our booking link to select a service, date and time. Your request will be sent to us for confirmation."],
+    ["Do I need to pay a deposit?", b.policy || "Please contact us to confirm our deposit and booking policy."],
+    ["What services do you offer?", prices]
+  ];
+}
+
+function renderReplies() {
+  var html = "";
+
+  answers().forEach(function(a) {
+    html += '<div class="item"><strong>' + esc(a[0]) + '</strong><p class="reply">' +
+      esc(a[1]) + '</p><button class="secondary" type="button" data-copy-reply="' +
+      encodeURIComponent(a[1]) + '">Copy answer</button></div>';
+  });
+
+  $("replyList").innerHTML = html;
+}
+
+function renderServices() {
+  $("mServices").textContent = services.length;
+
+  if (!services.length) {
+    $("serviceList").innerHTML = '<div class="empty">No services yet. Add your first service above.</div>';
+    return;
+  }
+
+  var html = "";
+
+  services.forEach(function(s) {
+    html += '<div class="item"><div class="row"><strong>' +
+      esc(s.name) + '</strong><span class="tag">' +
+      esc(priceLabel(s.price)) + '</span></div>';
+
+    if (s.note || s.description) {
+      html += '<p class="small">' + esc(s.note || s.description) + '</p>';
+    }
+
+    html += '<button class="danger" type="button" data-delete-service="' +
+      esc(s.id) + '">Delete</button></div>';
+  });
+
+  $("serviceList").innerHTML = html;
+}
+
+function renderBookings() {
+  $("mBookings").textContent = bookings.length;
+
+  if (!bookings.length) {
+    $("bookingList").innerHTML = '<div class="empty">No bookings recorded yet.</div>';
+    return;
+  }
+
+  var html = "";
+
+  bookings.forEach(function(b) {
+    html += '<div class="item"><div class="row"><strong>' +
+      esc(b.customer_name) + '</strong><span class="tag">' +
+      esc(b.status || "pending") + '</span></div><p class="small">' +
+      esc(b.service_name || "Service") + ' · ' +
+      esc(b.booking_date || "") + ' · ' + money(b.total_price) +
+      '</p><p class="small">Deposit: ' + money(b.deposit_paid) +
+      '</p><div class="row"><button class="secondary" type="button" data-status-booking="' +
+      esc(b.id) + '">Mark confirmed</button><button class="danger" type="button" data-delete-booking="' +
+      esc(b.id) + '">Delete</button></div></div>';
+  });
+
+  $("bookingList").innerHTML = html;
+}
+
+function render() {
+  $("welcome").textContent = "Welcome" +
+    (business && business.business_name ? " to " + business.business_name : " to PocketSeller");
+
+  $("bizName").value = business && business.business_name || "";
+  $("bizType").value = business && business.business_type || "Hairstylist / Wig installer";
+  $("bizLocation").value = business && business.location || "";
+  $("bizHours").value = business && business.hours || "";
+  $("bizPhone").value = business && business.whatsapp_number || "";
+  $("bizPolicy").value = business && business.policy || "";
+
+  renderServices();
+  renderBookings();
+  renderReplies();
+  renderSubscription();
+}
+
+function renderSubscription() {
+  var box = $("subscriptionStatus");
+
+  if (!subscription) {
+    box.className = "notice locked";
+    box.textContent = business
+      ? "No subscription record was found. Save your business setup again, then reload this page. If this persists, check the trial setup SQL."
+      : "Save your business setup to start your 7-day free trial.";
+  } else {
+    var expiry = new Date(subscription.expires_at);
+    var expiryText = subscription.expires_at ? expiry.toLocaleString() : "not set";
+
+    if (hasAccess()) {
+      var days = Math.max(0, Math.ceil((expiry.getTime() - Date.now()) / 86400000));
+      box.className = "notice good";
+      box.textContent = (subscription.status === "trial" ? "FREE TRIAL" : "SUBSCRIPTION ACTIVE") +
+        " · " + days + " day(s) remaining · access ends " + expiryText;
+    } else {
+      box.className = "notice locked";
+      box.textContent = "ACCESS EXPIRED · " + expiryText +
+        ". Renew for ₦1,500 to restore access. Your records remain saved.";
+    }
+  }
+
+  var pending = paymentRequests.some(function(p) {
+    return (p.review_status || p.status) === "pending";
+  });
+
+  $("paymentRequestBtn").disabled = pending;
+  $("paymentReference").disabled = pending;
+
+  if (pending) {
+    message("paymentMessage", "You already have a payment request pending verification.");
+  }
+
+  if (!paymentRequests.length) {
+    $("paymentRequestList").innerHTML = '<div class="empty">No payment requests yet.</div>';
+    applyAccess();
+    return;
+  }
+
+  var html = "";
+
+  paymentRequests.forEach(function(p) {
+    var status = p.review_status || p.status || "pending";
+
+    html += '<div class="item"><div class="row"><strong>' +
+      esc(p.payment_reference) + '</strong><span class="tag">' +
+      esc(status) + '</span></div><p class="small">' +
+      new Date(p.created_at).toLocaleString() + " · " +
+      money(p.amount) + '</p></div>';
+  });
+
+  $("paymentRequestList").innerHTML = html;
+  applyAccess();
+}
+
+function applyAccess() {
+  var active = hasAccess();
+
+  document.querySelectorAll('#ownerNav button[data-tab="services"],#ownerNav button[data-tab="replies"],#ownerNav button[data-tab="bookings"]').forEach(function(b) {
+    b.disabled = !active;
+  });
+
+  $("shareBtn").disabled = !active;
+  $("serviceForm").querySelector('button[type="submit"]').disabled = !active;
+  $("bookingForm").querySelector('button[type="submit"]').disabled = !active;
+
+  $("homeAccessNotice").className = "notice " + (active ? "good" : "locked");
+  $("homeAccessNotice").textContent = active
+    ? (subscription.status === "trial" ? "Your 7-day free trial is active." : "Your PocketSeller subscription is active.")
+    : "Services, smart replies, bookings, and your public booking link require an active trial or subscription. Open Subscription to renew.";
+}
+
+async function loadSubscription() {
+  if (!user) {
+    subscription = null;
+    paymentRequests = [];
+    return;
+  }
+
+  var r = await db.from("subscriptions")
+    .select("user_id,status,amount,started_at,expires_at,payment_method,payment_reference")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (r.error) {
+    subscription = null;
+    message("paymentMessage", "Could not load subscription: " + r.error.message);
+  } else {
+    subscription = r.data || null;
+  }
+
+  var q = await db.from("subscription_payment_requests")
+    .select("id,user_id,amount,payment_method,payment_reference,status,review_status,created_at,reviewed_at")
+    .eq("user_id", user.id)
+    .order("created_at", {ascending:false})
+    .limit(10);
+
+  paymentRequests = q.error ? [] : (q.data || []);
+  renderSubscription();
+}
+
+async function loadOwner() {
+  if (!user || isPublic) return;
+
+  $("authCard").classList.add("hidden");
+  $("ownerApp").classList.remove("hidden");
+  $("ownerEmail").textContent = user.email || "Signed in";
+  $("adminNavBtn").classList.toggle("hidden", !isPocketSellerAdmin());
+  message("bizMessage", "");
+
+  var result = await db.from("businesses")
+    .select("*")
+    .eq("owner_id", user.id)
+    .limit(1);
+
+  if (result.error) {
+    message("bizMessage", "Could not load your business: " + result.error.message);
+    return;
+  }
+
+  business = result.data && result.data.length ? result.data[0] : null;
+
+  if (business && !business.public_slug) {
+    var u = await db.from("businesses")
+      .update({public_slug:slugify(business.business_name)})
+      .eq("id", business.id)
+      .eq("owner_id", user.id)
+      .select("*")
+      .single();
+
+    if (!u.error) business = u.data;
+  }
+
+  await loadSubscription();
+
+  if (business) {
+    await loadServices();
+    await loadBookings();
+    render();
+    applyAccess();
+  } else {
+    services = [];
+    bookings = [];
+    render();
+    switchTab("setup");
+    message("bizMessage", "Save your business details to start your 7-day trial.");
+  }
+}
+
+async function loadServices() {
+  if (!business) {
+    services = [];
+    return;
+  }
+
+  var r = await db.from("services")
+    .select("*")
+    .eq("business_id", business.id)
+    .order("created_at", {ascending:false});
+
+  if (r.error) {
+    services = [];
+    if (hasAccess()) message("bizMessage", "Could not load services: " + r.error.message);
+    return;
+  }
+
+  services = r.data || [];
+}
+
+async function loadBookings() {
+  if (!business) {
+    bookings = [];
+    return;
+  }
+
+  var r = await db.from("bookings")
+    .select("*")
+    .eq("business_id", business.id)
+    .order("created_at", {ascending:false});
+
+  if (r.error) {
+    bookings = [];
+    if (hasAccess()) message("bookingMessage", "Could not load bookings: " + r.error.message);
+    return;
+  }
+
+  bookings = r.data || [];
+}
+
+async function loadAdminPayments() {
+  if (!isPocketSellerAdmin()) {
+    message("adminMessage", "Not authorized.");
+    return;
+  }
+
+  message("adminMessage", "Loading payment requests...");
+  $("adminPaymentList").innerHTML = "";
+
+  var r = await db.rpc("pocketseller_admin_list_payments");
+
+  if (r.error) {
+    message("adminMessage", "Could not load requests: " + r.error.message);
+    return;
+  }
+
+  var rows = r.data || [];
+
+  if (!rows.length) {
+    $("adminPaymentList").innerHTML = '<p class="empty">No payment requests yet.</p>';
+    message("adminMessage", "");
+    return;
+  }
+
+  var html = "";
+
+  rows.forEach(function(p) {
+    var review = p.review_status || p.status || "pending";
+
+    html += '<div class="item"><strong>' + esc(p.payment_reference || "No reference") +
+      '</strong><p class="small">User ID: ' + esc(p.user_id) +
+      '</p><p class="small">Amount: ' + money(p.amount) +
+      '</p><p class="small">Method: ' + esc(p.payment_method) +
+      '</p><p class="small">Submitted: ' +
+      esc(p.created_at ? new Date(p.created_at).toLocaleString() : "") +
+      '</p><p class="small">Review status: ' + esc(review) + '</p>';
+
+    if (review === "pending") {
+      html += '<button class="primary full" type="button" data-approve-payment="' +
+        esc(p.id) + '">Approve verified payment</button>';
+    }
+
+    html += '</div>';
+  });
+
+  $("adminPaymentList").innerHTML = html;
+  message("adminMessage", "Payment requests loaded.");
+}
+
+$("refreshPaymentsBtn").addEventListener("click", loadAdminPayments);
+
+document.addEventListener("click", async function(e) {
+  var btn = e.target.closest("[data-approve-payment]");
+  if (!btn) return;
+
+  if (!isPocketSellerAdmin()) {
+    alert("Not authorized.");
+    return;
+  }
+
+  var id = btn.getAttribute("data-approve-payment");
+
+  if (!confirm("Have you confirmed that this ₦1,500 transfer arrived in your UBA account? Only approve if the money is received.")) {
+    return;
+  }
+
+  btn.disabled = true;
+  message("adminMessage", "Approving payment...");
+
+  var r = await db.rpc("pocketseller_admin_approve_payment", {p_request_id:id});
+
+  if (r.error) {
+    message("adminMessage", "Approval failed: " + r.error.message);
+    btn.disabled = false;
+    return;
+  }
+
+  message("adminMessage", "Payment approved. Subscription activated.");
+  await loadAdminPayments();
+});
+
+$("authForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  var email = $("authEmail").value.trim();
+  var password = $("authPassword").value;
+
+  if (authMode === "signin") {
+    message("authMessage", "Signing in...");
+    $("authSubmit").disabled = true;
+
+    try {
+      var r = await db.auth.signInWithPassword({email:email, password:password});
+
+      if (r.error) {
+        message("authMessage", r.error.message);
+        return;
+      }
+
+      user = r.data.user;
+      await loadOwner();
+    } catch(err) {
+      message("authMessage", "Sign-in failed: " + (err.message || String(err)));
+    } finally {
+      $("authSubmit").disabled = false;
+    }
+
+    return;
+  }
+
+  if (authMode === "signup") {
+    var name = $("authName").value.trim();
+    var confirmPassword = $("authPasswordConfirm").value;
+
+    if (!name) {
+      message("authMessage", "Enter your name.");
+      return;
+    }
+
+    if (password.length < 6 || password !== confirmPassword) {
+      message("authMessage", password.length < 6
+        ? "Use a password with at least 6 characters."
+        : "The passwords do not match.");
+      return;
+    }
+
+    message("authMessage", "Creating your account...");
+    $("authSubmit").disabled = true;
+
+    try {
+      var s = await db.auth.signUp({
+        email:email,
+        password:password,
+        options:{
+          data:{full_name:name},
+          emailRedirectTo:siteRedirect()
+        }
+      });
+
+      if (s.error) {
+        var errText = String(s.error.message || "");
+        var lowerErr = errText.toLowerCase();
+
+        if (lowerErr.includes("rate limit") || lowerErr.includes("too many requests")) {
+          message("authMessage", "Email limit reached. Please wait before trying again. Do not keep submitting repeated requests.");
+        } else {
+          message("authMessage", errText);
+        }
+
+        return;
+      }
+
+      if (s.data.session && s.data.user) {
+        user = s.data.user;
+        await loadOwner();
+      } else {
+        setAuthMode("signin");
+        message("authMessage", "Account created. If email confirmation is enabled, confirm your email before signing in.");
+      }
+    } catch(er) {
+      message("authMessage", "Account creation failed: " + (er.message || String(er)));
+    } finally {
+      $("authSubmit").disabled = false;
+    }
+
+    return;
+  }
+
+  if (authMode === "forgot") {
+    message("authMessage", "Sending password reset email...");
+    $("authSubmit").disabled = true;
+
+    try {
+      var f = await db.auth.resetPasswordForEmail(email, {redirectTo:siteRedirect()});
+
+      if (f.error) {
+        message("authMessage", f.error.message);
+        return;
+      }
+
+      message("authMessage", "If an account uses that email, a reset link has been sent. Check inbox and spam.");
+    } catch(er2) {
+      message("authMessage", er2.message || String(er2));
+    } finally {
+      $("authSubmit").disabled = false;
+    }
+
+    return;
+  }
+
+  if (authMode === "reset") {
+    var cn = $("authPasswordConfirm").value;
+
+    if (password.length < 6 || password !== cn) {
+      message("authMessage", password.length < 6
+        ? "Use a password with at least 6 characters."
+        : "The passwords do not match.");
+      return;
+    }
+
+    $("authSubmit").disabled = true;
+
+    try {
+      var up = await db.auth.updateUser({password:password});
+
+      if (up.error) {
+        message("authMessage", up.error.message);
+        return;
+      }
+
+      setAuthMode("signin");
+      message("authMessage", "Password updated. Sign in with your new password.");
+    } catch(er3) {
+      message("authMessage", er3.message || String(er3));
+    } finally {
+      $("authSubmit").disabled = false;
+    }
+  }
+});
+
+$("signupBtn").addEventListener("click", function() {
+  setAuthMode("signup");
+});
+
+$("forgotBtn").addEventListener("click", function() {
+  setAuthMode("forgot");
+});
+
+$("backLoginBtn").addEventListener("click", function() {
+  setAuthMode("signin");
+});
+
+$("googleBtn").addEventListener("click", async function() {
+  message("authMessage", "Google sign-in may not be enabled in Supabase yet. Use email and password if it fails.");
+
+  try {
+    var r = await db.auth.signInWithOAuth({
+      provider:"google",
+      options:{redirectTo:siteRedirect()}
+    });
+
+    if (r.error) {
+      message("authMessage", "Google sign-in is not configured. Use email and password. " + r.error.message);
+    }
+  } catch(e) {
+    message("authMessage", "Google sign-in is not configured. Use email and password.");
+  }
+});
+
+$("signoutBtn").addEventListener("click", async function() {
+  await db.auth.signOut();
+  showSignedOut("You have signed out.");
+});
+
+$("bizForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  if (!user) {
+    message("bizMessage", "Please sign in first.");
+    return;
+  }
+
+  var fields = {
+    business_name:$("bizName").value.trim(),
+    business_type:$("bizType").value,
+    location:$("bizLocation").value.trim(),
+    hours:$("bizHours").value.trim(),
+    whatsapp_number:$("bizPhone").value.replace(/\D/g, ""),
+    policy:$("bizPolicy").value.trim()
+  };
+
+  if (!fields.business_name) {
+    message("bizMessage", "Enter your business name.");
+    return;
+  }
+
+  if (!business) fields.public_slug = slugify(fields.business_name);
+
+  message("bizMessage", "Saving business details...");
+
+  var r;
+
+  try {
+    if (business) {
+      r = await db.from("businesses")
+        .update(fields)
+        .eq("id", business.id)
+        .eq("owner_id", user.id)
+        .select("*")
+        .single();
+    } else {
+      fields.owner_id = user.id;
+      r = await db.from("businesses")
+        .insert(fields)
+        .select("*")
+        .single();
+    }
+  } catch(er) {
+    message("bizMessage", "Save failed: " + (er.message || String(er)));
+    return;
+  }
+
+  if (r.error) {
+    message("bizMessage", "Save failed: " + r.error.message);
+    return;
+  }
+
+  business = r.data;
+  await loadSubscription();
+  render();
+  applyAccess();
+  message("bizMessage", "Business details saved. Your trial starts when the database records your setup.");
+});
+
+$("serviceForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  if (!hasAccess()) {
+    switchTab("subscription");
+    return;
+  }
+
+  if (!business) {
+    alert("Save your business setup first.");
+    return;
+  }
+
+  var rawPrice = $("sPrice").value.trim();
+  var price = rawPrice === "" ? null : Number(rawPrice);
+
+  if (price !== null && (!Number.isFinite(price) || price < 0)) {
+    alert("Enter a valid price or leave it blank.");
+    return;
+  }
+
+  var serviceName = $("sName").value.trim();
+
+  if (!serviceName) {
+    alert("Enter a service name.");
+    return;
+  }
+
+  var v = {
+    business_id:business.id,
+    name:serviceName,
+    description:$("sNote").value.trim(),
+    note:$("sNote").value.trim(),
+    price:price,
+    duration_minutes:30,
+    active:true
+  };
+
+  var r = await db.from("services").insert(v);
+
+  if (r.error) {
+    alert("Could not save service: " + r.error.message +
+      (price === null ? "\n\nIf the database requires a price, update the services.price column to allow NULL." : ""));
+    return;
+  }
+
+  $("serviceForm").reset();
+  await loadServices();
+  render();
+});
+
+$("bookingForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  if (!hasAccess()) {
+    switchTab("subscription");
+    return;
+  }
+
+  if (!business) {
+    alert("Save your business setup first.");
+    return;
+  }
+
+  var price = Number($("bPrice").value);
+  var paid = Number($("bPaid").value);
+
+  if (price < 0 || paid < 0 || paid > price) {
+    alert(paid > price ? "Deposit cannot exceed total price." : "Amounts cannot be negative.");
+    return;
+  }
+
+  var r = await db.from("bookings").insert({
+    business_id:business.id,
+    customer_name:$("bName").value.trim(),
+    service_name:$("bService").value.trim(),
+    booking_date:$("bDate").value,
+    booking_time:"12:00",
+    total_price:price,
+    deposit_paid:paid,
+    status:"pending"
+  });
+
+  if (r.error) {
+    message("bookingMessage", "Could not record booking: " + r.error.message);
+    return;
+  }
+
+  $("bookingForm").reset();
+  $("bPaid").value = "0";
+  await loadBookings();
+  render();
+  message("bookingMessage", "Booking recorded successfully.");
+});
+
+$("shareBtn").addEventListener("click", function() {
+  if (!hasAccess()) {
+    switchTab("subscription");
+    return;
+  }
+
+  var url = bookingUrl();
+
+  if (!url) {
+    alert("Save your business setup first.");
+    return;
+  }
+
+  $("bookingLink").value = url;
+  $("linkBox").classList.remove("hidden");
+});
+
+$("copyBtn").addEventListener("click", async function() {
+  var inp = $("bookingLink");
+  inp.select();
+
+  try {
+    await navigator.clipboard.writeText(inp.value);
+    alert("Booking link copied.");
+  } catch(e) {
+    window.prompt("Select and copy your booking link:", inp.value);
+  }
+});
+
+$("copyUbaBtn").addEventListener("click", async function() {
+  try {
+    await navigator.clipboard.writeText("2418063150");
+    message("paymentMessage", "UBA account number copied.");
+  } catch(e) {
+    window.prompt("Copy this UBA account number:", "2418063150");
+  }
+});
+
+$("previewBtn").addEventListener("click", function() {
+  if (!hasAccess()) {
+    switchTab("subscription");
+    return;
+  }
+
+  var f = answers().find(function(a) {
+    return a[0] === $("question").value;
+  });
+
+  $("preview").textContent = f ? f[1] : "";
+  $("preview").classList.remove("hidden");
+});
+
+$("paymentRequestForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  if (!user) return;
+
+  var ref = $("paymentReference").value.trim();
+
+  if (ref.length < 3) {
+    message("paymentMessage", "Enter the transaction reference from your UBA transfer receipt.");
+    return;
+  }
+
+  if (paymentRequests.some(function(p) {
+    return (p.review_status || p.status) === "pending";
+  })) {
+    message("paymentMessage", "You already have a request waiting for verification.");
+    return;
+  }
+
+  $("paymentRequestBtn").disabled = true;
+  message("paymentMessage", "Submitting payment reference...");
+
+  var r = await db.from("subscription_payment_requests").insert({
+    user_id:user.id,
+    amount:1500,
+    payment_method:"UBA",
+    payment_reference:ref,
+    status:"pending"
+  });
+
+  if (r.error) {
+    message("paymentMessage", "Could not submit request: " + r.error.message);
+    $("paymentRequestBtn").disabled = false;
+    return;
+  }
+
+  $("paymentReference").value = "";
+  await loadSubscription();
+  message("paymentMessage", "Payment reference submitted. Access activates only after the PocketSeller operator verifies the transfer.");
+});
+
+document.addEventListener("click", async function(e) {
+  var c = e.target.closest("[data-copy-reply]");
+
+  if (c) {
+    var v = decodeURIComponent(c.getAttribute("data-copy-reply"));
+
+    try {
+      await navigator.clipboard.writeText(v);
+      alert("Answer copied.");
+    } catch(er) {
+      window.prompt("Copy this answer:", v);
+    }
+
+    return;
+  }
+
+  var ds = e.target.closest("[data-delete-service]");
+
+  if (ds) {
+    if (!hasAccess()) {
+      switchTab("subscription");
+      return;
+    }
+
+    if (!confirm("Delete this service?")) return;
+
+    var x = await db.from("services")
+      .delete()
+      .eq("id", ds.getAttribute("data-delete-service"))
+      .eq("business_id", business.id);
+
+    if (x.error) {
+      alert("Delete failed: " + x.error.message);
+      return;
+    }
+
+    await loadServices();
+    render();
+    return;
+  }
+
+  var cb = e.target.closest("[data-status-booking]");
+
+  if (cb) {
+    if (!hasAccess()) {
+      switchTab("subscription");
+      return;
+    }
+
+    var y = await db.from("bookings")
+      .update({status:"confirmed"})
+      .eq("id", cb.getAttribute("data-status-booking"))
+      .eq("business_id", business.id);
+
+    if (y.error) {
+      alert("Could not update booking: " + y.error.message);
+      return;
+    }
+
+    await loadBookings();
+    render();
+    return;
+  }
+
+  var dbk = e.target.closest("[data-delete-booking]");
+
+  if (dbk) {
+    if (!hasAccess()) {
+      switchTab("subscription");
+      return;
+    }
+
+    if (!confirm("Delete this booking record?")) return;
+
+    var z = await db.from("bookings")
+      .delete()
+      .eq("id", dbk.getAttribute("data-delete-booking"))
+      .eq("business_id", business.id);
+
+    if (z.error) {
+      alert("Delete failed: " + z.error.message);
+      return;
+    }
+
+    await loadBookings();
+    render();
+  }
+});
+
+async function loadPublic() {
+  $("authCard").classList.add("hidden");
+  $("ownerApp").classList.add("hidden");
+  $("publicPage").classList.remove("hidden");
+
+  var t = new Date();
+  var min = t.getFullYear() + "-" +
+    String(t.getMonth() + 1).padStart(2, "0") + "-" +
+    String(t.getDate()).padStart(2, "0");
+
+  $("pDate").min = min;
+
+  if (!publicSlug) {
+    $("publicTitle").textContent = "Booking link missing";
+    $("publicInfo").textContent = "Please use the complete booking link from the business.";
+    $("publicForm").classList.add("hidden");
+    return;
+  }
+
+  var br = await db.rpc("ps_get_public_business_for_booking", {p_slug:publicSlug});
+
+  if (br.error || !br.data) {
+    $("publicTitle").textContent = "Booking is unavailable";
+    $("publicInfo").textContent = "This business may have an expired trial/subscription or an invalid booking link. Please contact the business directly.";
+    $("publicForm").classList.add("hidden");
+    return;
+  }
+
+  var b = Array.isArray(br.data) ? br.data[0] : br.data;
+
+  if (!b) {
+    $("publicTitle").textContent = "Booking is unavailable";
+    $("publicInfo").textContent = "Please contact the business directly.";
+    $("publicForm").classList.add("hidden");
+    return;
+  }
+
+  business = b;
+  $("publicTitle").textContent = "Book with " + b.business_name;
+  $("publicInfo").textContent = [b.location, b.hours].filter(Boolean).join(" · ");
+
+  var sr = await db.rpc("ps_get_public_services_for_booking", {p_slug:publicSlug});
+  services = sr.data || [];
+
+  if (!Array.isArray(services)) services = [];
+
+  var opts = '<option value="">Choose a service</option>';
+  var cards = "";
+
+  services.forEach(function(s) {
+    opts += '<option value="' + esc(s.id) + '">' +
+      esc(s.name) + " — " + esc(priceLabel(s.price)) + '</option>';
+
+    cards += '<div class="item"><strong>' + esc(s.name) +
+      '</strong><p>' + esc(priceLabel(s.price)) + '</p>';
+
+    if (s.description || s.note) {
+      cards += '<p class="small">' + esc(s.note || s.description) + '</p>';
+    }
+
+    cards += '</div>';
+  });
+
+  $("pService").innerHTML = opts;
+  $("publicServices").innerHTML = cards || '<p class="empty">No services are currently available.</p>';
+
+  if (!services.length) $("publicForm").classList.add("hidden");
+}
+
+$("publicForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  if (!business || !services.length) return;
+
+  var s = services.find(function(v) {
+    return String(v.id) === String($("pService").value);
+  });
+
+  if (!s) {
+    alert("Please choose a service.");
+    return;
+  }
+
+  var date = $("pDate").value;
+
+  if (!date || date < $("pDate").min) {
+    alert("Please choose today or a future date.");
+    return;
+  }
+
+  var contact = $("pContact").value.trim();
+  var notes = $("pNotes").value.trim();
+  var btn = $("publicForm").querySelector('button[type="submit"]');
+
+  btn.disabled = true;
+  btn.textContent = "Sending request...";
+
+  try {
+    var r = await db.rpc("ps_submit_public_booking", {
+      p_slug:publicSlug,
+      p_service_id:s.id,
+      p_customer_name:$("pName").value.trim(),
+      p_customer_phone:contact,
+      p_booking_date:date,
+      p_booking_time:$("pTime").value,
+      p_notes:notes
+    });
+
+    if (r.error) {
+      $("publicMessage").textContent = "Booking could not be saved: " + r.error.message;
+      $("publicMessage").classList.remove("hidden");
+      return;
+    }
+
+    var time = $("pTime").selectedOptions[0]
+      ? $("pTime").selectedOptions[0].text
+      : $("pTime").value;
+
+    var txt = "Hello, I submitted a booking request.\n" +
+      "Name: " + $("pName").value.trim() + "\n" +
+      "Service: " + s.name + "\n" +
+      "Price: " + priceLabel(s.price) + "\n" +
+      "Date: " + date + "\n" +
+      "Time: " + time + "\n" +
+      "Contact: " + contact +
+      (notes ? "\nNotes: " + notes : "") +
+      "\nPlease confirm availability.";
+
+    var link = waLink(txt);
+
+    $("publicMessage").textContent = "Your request has been recorded. " +
+      (link ? "Opening WhatsApp so you can contact the business." : "Please contact the business to confirm.");
+
+    $("publicMessage").classList.remove("hidden");
+
+    if (link) location.href = link;
+  } catch(er) {
+    $("publicMessage").textContent = "Booking failed: " + (er.message || String(er));
+    $("publicMessage").classList.remove("hidden");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Send booking request";
+  }
+});
+
+async function start() {
+  if (isPublic) {
+    await loadPublic();
+    return;
+  }
+
+  db.auth.onAuthStateChange(function(ev, session) {
+    window.setTimeout(function() {
+      if (ev === "PASSWORD_RECOVERY") {
+        $("ownerApp").classList.add("hidden");
+        setAuthMode("reset");
+        message("authMessage", "Choose a new password for your account.");
+        return;
+      }
+
+      if (ev === "SIGNED_OUT") {
+        showSignedOut("");
+        return;
+      }
+
+      if (ev === "SIGNED_IN" && session && session.user && !user) {
+        user = session.user;
+        loadOwner();
+      }
+    }, 0);
+  });
+
+  var r = await db.auth.getSession();
+
+  if (r.error) {
+    message("authMessage", "Could not check your session: " + r.error.message);
+    return;
+  }
+
+  if (r.data && r.data.session) {
+    user = r.data.session.user;
+    await loadOwner();
+  } else {
+    setAuthMode("signin");
+  }
+}
+
+setAuthMode("signin");
+
+start().catch(function(er) {
+  if (!isPublic) {
+    message("authMessage", "PocketSeller could not start: " + (er.message || String(er)));
+  } else {
+    message("publicInfo", "Could not load the booking page. Please try again.");
+  }
+});
+
 })();
-</script></body></html>
+</script>
+</body>
+</html>
